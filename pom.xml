@@ -27,8 +27,30 @@
 
 	<name>Vuecket POM</name>
 	<url>http://orienteer.org</url>
-	<description>Vuecket - power of Vue.JS married with super power of Apache Wicket</description>
+	<description>Vuecket - power of Vue.JS married with magic of Apache Wicket</description>
 
+	<scm>
+	    <url>https://github.com/OrienteerBAP/vuecket</url>
+	    <connection>scm:git:ssh://github.com/OrienteerBAP/vuecket.git</connection>
+	    <developerConnection>scm:git:ssh://git@github.com/OrienteerBAP/vuecket.git</developerConnection>
+	    <tag>HEAD</tag>
+	</scm>
+	<issueManagement>
+	    <system>github</system>
+	    <url>https://github.com/OrienteerBAP/vuecket/issues</url>
+	</issueManagement>
+
+	<distributionManagement>
+	  <snapshotRepository>
+	    <id>ossrh</id>
+	    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+	  </snapshotRepository>
+	  <repository>
+	    <id>ossrh</id>
+	    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+	  </repository>
+	</distributionManagement>
+	
 	<developers>
 	    <developer>
             <id>owner</id>
