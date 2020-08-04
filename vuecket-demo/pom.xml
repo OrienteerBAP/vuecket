@@ -16,10 +16,10 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.wicket</groupId>
-			<artifactId>wicket-core</artifactId>
+			<groupId>org.orienteer.vuecket</groupId>
+			<artifactId>vuecket</artifactId>
+			<version>${project.version}</version>
 		</dependency>
-
 		<!-- LOGGING DEPENDENCIES - SLF4J-SIMPLE -->
 		<dependency>
 			<groupId>org.slf4j</groupId>

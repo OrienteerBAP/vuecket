@@ -71,5 +71,62 @@
 				</excludes>
 			</testResource>
 		</testResources>
+		<plugins>
+			<plugin>
+			<groupId>org.orienteer.jnpm</groupId>
+			    <artifactId>jnpm-maven-plugin</artifactId>
+				<version>1.1-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>install</goal>
+						</goals>
+						<configuration>
+							<packages>
+								<package>vue@2.6.11</package>
+								<package>http-vue-loader@1.4.2</package>
+							</packages>
+							<pathPrefix>org/orienteer/vuecket/external</pathPrefix>
+							<strategy>SIMPLE</strategy>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.orienteer.jnpm
+										</groupId>
+										<artifactId>
+											jnpm-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.0,)
+										</versionRange>
+										<goals>
+											<goal>install</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>
