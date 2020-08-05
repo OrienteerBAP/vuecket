@@ -6,6 +6,7 @@ import org.apache.wicket.markup.head.JavaScriptContentHeaderItem;
 import org.apache.wicket.markup.html.GenericWebMarkupContainer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.orienteer.vuecket.util.IVueComponentHeaderItemSupplier;
 
 public class VueComponent<T> extends GenericWebMarkupContainer<T> implements IVueComponentHeaderItemSupplier {
@@ -41,14 +42,19 @@ public class VueComponent<T> extends GenericWebMarkupContainer<T> implements IVu
 		this.vueDescriptor = new VueDescriptor(vueDescriptor);
 		return this;
 	}
+	
+	public VueComponent<T> setVueDescriptor(ResourceReference reference) {
+		this.vueDescriptor = new VueDescriptor(reference);
+		return this;
+	}
 
 	@Override
 	public VueComponentHeaderItem getVueComponentHeaderItem() {
 		if(vueDescriptor==null) throw new WicketRuntimeException("VueDescriptor was not defined for component '"+getId()+"'");
 		if(findParent(VueComponent.class)==null) {
-			return VueComponentHeaderItem.forRootAppDescriptor(getMarkupId(), vueDescriptor.getValue());
+			return VueComponentHeaderItem.forRootApp(getMarkupId(), vueDescriptor);
 		} else {
-			return VueComponentHeaderItem.forComponentDescriptor(vueDescriptor.getName(), vueDescriptor.getValue());
+			return VueComponentHeaderItem.forComponent(vueDescriptor);
 		}
 	}
 }

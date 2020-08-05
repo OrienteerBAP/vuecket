@@ -15,7 +15,8 @@ public class HomePage extends WebPage {
 				.setVueDescriptor("{ data: { message : 'Hello Vue'}}")
 		);
 		
-		add(new Label("app2", urlFor(new PackageResourceReference(HomePage.class, "HomePage.app2.vue"), null).toString()));
-
+		add(new VueComponent<String>("app2")
+				.setVueDescriptor(new PackageResourceReference(HomePage.class,"HomePage.app2.vue"))
+		);
 	}
 }
