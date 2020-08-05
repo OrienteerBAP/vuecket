@@ -1,4 +1,4 @@
-package org.orienteer.vuecket.demo;
+package org.orienteer.vuecket;
 
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
@@ -14,6 +14,8 @@ public class HomePage extends WebPage {
 		add(new VueComponent<String>("app")
 				.setVueDescriptor("{ data: { message : 'Hello Vue'}}")
 		);
+		
+		add(new Label("app2", urlFor(new PackageResourceReference(HomePage.class, "HomePage.app2.vue"), null).toString()));
 
 	}
 }

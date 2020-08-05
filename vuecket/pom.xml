@@ -92,6 +92,32 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>${jetty9.version}</version>
+				<configuration>
+					<systemProperties>
+						<systemProperty>
+							<name>maven.project.build.directory.test-classes</name>
+							<value>${project.build.directory}/test-classes</value>
+						</systemProperty>
+					</systemProperties>
+					<useProvidedScope>true</useProvidedScope>
+                    <useTestScope>true</useTestScope>
+					<supportedPackagings>
+                        <supportedPackaging>jar</supportedPackaging>
+                    </supportedPackagings>
+					<jettyXml>${project.basedir}/../vuecket-demo/src/test/jetty/jetty.xml,${project.basedir}/../vuecket-demo/src/test/jetty/jetty-http.xml</jettyXml>
+					<webApp>
+						<descriptor>${project.basedir}/src/test/jetty/web.xml</descriptor>
+						<contextPath>/</contextPath>
+						<resourceBase>src/test/resources</resourceBase>
+						<containerIncludeJarPattern>^$</containerIncludeJarPattern>
+						<webInfIncludeJarPattern>^$</webInfIncludeJarPattern>
+					</webApp>
+				</configuration>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
