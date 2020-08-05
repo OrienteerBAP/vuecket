@@ -20,7 +20,7 @@ public class VueComponent<T> extends GenericWebMarkupContainer<T> implements IVu
 	public VueComponent(String id, IModel<?> model) {
 		super(id, model);
 		Vue vue = this.getClass().getAnnotation(Vue.class);
-		if(vue!=null) setVueDescriptor(new VueDescriptor(vue));
+		if(vue!=null) setVueDescriptor(new VueDescriptor(this, vue));
 		add(new VueBehavior(this));
 	}
 	

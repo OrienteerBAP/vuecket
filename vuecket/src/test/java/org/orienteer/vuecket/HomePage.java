@@ -18,5 +18,6 @@ public class HomePage extends WebPage {
 		add(new VueComponent<String>("app2")
 				.setVueDescriptor(new PackageResourceReference(HomePage.class,"HomePage.app2.vue"))
 		);
+		add(new VueApp3("app3"));
 	}
 }

@@ -1,5 +1,6 @@
 package org.orienteer.vuecket;
 
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.io.IClusterable;
 import org.apache.wicket.util.string.Strings;
@@ -14,8 +15,15 @@ public class VueDescriptor implements IClusterable {
 	private String value;
 	private ResourceReference reference;
 	
-	public VueDescriptor(Vue vue) {
-		this(vue.name(), vue.type(), vue.value());
+	public VueDescriptor(VueComponent<?> comp, Vue vue) {
+		this.name = vue.name();
+		this.type = vue.type();
+		this.value = vue.value();
+		if(type==null || Type.AUTODETECT.equals(type)) this.type = guessType(value, null);
+		if(Type.VUE.equals(type)) {
+			reference = new PackageResourceReference(comp.getClass(), value);
+			value = null;
+		}
 	}
 	
 	public VueDescriptor(String value) {
