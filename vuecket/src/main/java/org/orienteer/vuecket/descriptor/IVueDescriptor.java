@@ -17,7 +17,8 @@ public interface IVueDescriptor {
 		if(ret!=null) return ret;
 		ret = VueFileDescriptor.create(clazz);
 		if(ret!=null) return ret;
-		
+		ret = VueNpmDescriptor.create(clazz);
+		if(ret!=null) return ret;
 		return ret;
 	}
 }

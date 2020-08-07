@@ -9,6 +9,8 @@ import org.orienteer.vuecket.util.VuecketUtils;
 
 public class VueJsonDescriptor implements IVueDescriptor {
 	
+	public static final VueJsonDescriptor EMPTY_ROOT = new VueJsonDescriptor("{}");
+	
 	private String name;
 	private String json;
 	

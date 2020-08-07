@@ -49,10 +49,12 @@ public class VueComponent<T> extends GenericWebMarkupContainer<T> implements IVu
 
 	@Override
 	public VueComponentHeaderItem getVueComponentHeaderItem() {
-		if(vueDescriptor==null) throw new WicketRuntimeException("VueDescriptor was not defined for component '"+getId()+"'");
 		if(findParent(VueComponent.class)==null) {
-			return vueDescriptor.rootHeaderItem(getMarkupId());
+			
+			return (vueDescriptor!=null?vueDescriptor:VueJsonDescriptor.EMPTY_ROOT)
+									.rootHeaderItem(getMarkupId());
 		} else {
+			if(vueDescriptor==null) throw new WicketRuntimeException("VueDescriptor was not defined for component '"+getId()+"'");
 			return vueDescriptor.componentHeaderItem();
 		}
 	}
