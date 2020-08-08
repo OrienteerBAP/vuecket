@@ -34,7 +34,7 @@
 		<div>
 			<h1>App #5</h1>
 			<div wicket:id="app5">
-				<button @click="$vcCall('Hello There')">ClickMe</button>
+				<button @click="count++; $vcCall('count', count)">Clicked {{count}} times</button>
 			</div>
 		</div>
 		<form wicket:id="form">

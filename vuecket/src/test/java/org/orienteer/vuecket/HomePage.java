@@ -27,7 +27,8 @@ public class HomePage extends WebPage {
 		app4.add(new VueMarkdown("markdown", "Hello **there**"));
 		add(app4);
 		
-		add(new VueComponent<Object>("app5"));
+		add(new VueComponent<Object>("app5")
+				.setVueDescriptor("{ data: { count : 0 }}"));
 		
 		Form<?> form = new Form<Object>("form");
 		form.add(new AjaxButton("button") {

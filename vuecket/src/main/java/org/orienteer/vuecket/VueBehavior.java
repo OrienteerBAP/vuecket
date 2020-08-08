@@ -79,7 +79,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	@Override
 	protected void respond(AjaxRequestTarget target) {
 		String arguments = RequestCycle.get().getRequest().getRequestParameters()
-				 .getParameterValue("arguments").toString();
+				 .getParameterValue("args").toString();
 		System.out.println("Arguments = "+arguments);
 	}
 	
