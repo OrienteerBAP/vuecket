@@ -4,6 +4,9 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.orienteer.vuecket.VueComponent;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.WebPage;
 
 public class HomePage extends WebPage {
@@ -23,5 +26,16 @@ public class HomePage extends WebPage {
 		VueComponent<Object> app4 = new VueComponent<Object>("app4");
 		app4.add(new VueMarkdown("markdown", "Hello **there**"));
 		add(app4);
+		
+		add(new VueComponent<Object>("app5"));
+		
+		Form<?> form = new Form<Object>("form");
+		form.add(new AjaxButton("button") {
+			@Override
+			protected void onSubmit(AjaxRequestTarget target) {
+				System.out.println("Clicked!");
+			}
+		});
+		add(form);
 	}
 }

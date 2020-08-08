@@ -10,6 +10,7 @@ import org.apache.wicket.core.util.string.JavaScriptUtils;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.util.string.StringValue;
 import org.orienteer.vuecket.descriptor.IVueDescriptor;
@@ -77,8 +78,9 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 
 	@Override
 	protected void respond(AjaxRequestTarget target) {
-		// TODO Auto-generated method stub
-		
+		String arguments = RequestCycle.get().getRequest().getRequestParameters()
+				 .getParameterValue("arguments").toString();
+		System.out.println("Arguments = "+arguments);
 	}
 	
 	@Override
@@ -95,7 +97,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	protected void onComponentTag(ComponentTag tag) {
 		super.onComponentTag(tag);
 		
-		tag.put(":vuecket", StringValue.valueOf("'"+JavaScriptUtils.escapeQuotes(getCallbackUrl())+"'"));
+		tag.put(":vc-url", StringValue.valueOf("'"+JavaScriptUtils.escapeQuotes(getCallbackUrl())+"'"));
 	}
 
 }
