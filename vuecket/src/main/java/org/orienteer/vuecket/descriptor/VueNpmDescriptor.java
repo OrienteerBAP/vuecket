@@ -55,7 +55,7 @@ public class VueNpmDescriptor implements IVueDescriptor {
 						OnDomReadyHeaderItem.forScript(getEnablementScript()));
 	}
 
-	public static VueNpmDescriptor create(Class<? extends VueComponent<?>> clazz) {
+	public static VueNpmDescriptor create(Class<?> clazz) {
 		VueNpm vueNpm = VuecketUtils.findAnnotation(clazz, VueNpm.class);
 		if(vueNpm==null) return null;
 		else return new VueNpmDescriptor(vueNpm);

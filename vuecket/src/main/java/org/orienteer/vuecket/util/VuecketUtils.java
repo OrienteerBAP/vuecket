@@ -1,7 +1,12 @@
 package org.orienteer.vuecket.util;
 
 import java.lang.annotation.Annotation;
+import java.util.List;
 import java.util.Random;
+
+import org.apache.wicket.Component;
+import org.orienteer.vuecket.VueBehavior;
+import org.orienteer.vuecket.VueComponent;
 
 public final class VuecketUtils {
 	
@@ -26,6 +31,14 @@ public final class VuecketUtils {
 			if(ret!=null) return clazz;
 		}
 		return null;
+	}
+	
+	public static VueBehavior findVueBehavior(Component comp) {
+		if(comp instanceof VueComponent) return ((VueComponent<?>)comp).getVueBehavior();
+		else {
+			List<VueBehavior> vueBehaviors = comp.getBehaviors(VueBehavior.class);
+			return vueBehaviors==null || vueBehaviors.isEmpty()? null:vueBehaviors.get(0);
+		}
 	}
 	
 	public static String randomId() {

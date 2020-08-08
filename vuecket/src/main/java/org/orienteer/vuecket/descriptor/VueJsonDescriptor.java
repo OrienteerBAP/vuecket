@@ -36,7 +36,7 @@ public class VueJsonDescriptor implements IVueDescriptor {
 		return json;
 	}
 	
-	public static VueJsonDescriptor create(Class<? extends VueComponent<?>> clazz) {
+	public static VueJsonDescriptor create(Class<?> clazz) {
 		VueJson vueJson = VuecketUtils.findAnnotation(clazz, VueJson.class);
 		if(vueJson==null) return null;
 		else return new VueJsonDescriptor(vueJson);

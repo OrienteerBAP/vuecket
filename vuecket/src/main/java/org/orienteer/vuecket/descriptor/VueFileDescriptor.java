@@ -37,7 +37,7 @@ public class VueFileDescriptor implements IVueDescriptor {
 		return reference;
 	}
 	
-	public static VueFileDescriptor create(Class<? extends VueComponent<?>> clazz) {
+	public static VueFileDescriptor create(Class<?> clazz) {
 		Class<?> compClazz = VuecketUtils.findClassWithAnnotation(clazz, VueFile.class);
 		if(compClazz==null) return null;
 		else return new VueFileDescriptor(compClazz.getAnnotation(VueFile.class), compClazz);
