@@ -81,6 +81,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		String arguments = RequestCycle.get().getRequest().getRequestParameters()
 				 .getParameterValue("args").toString();
 		System.out.println("Arguments = "+arguments);
+		target.appendJavaScript("$vc('"+getComponent().getMarkupId()+"').$vcApply({server:'hello from server'})");
 	}
 	
 	@Override

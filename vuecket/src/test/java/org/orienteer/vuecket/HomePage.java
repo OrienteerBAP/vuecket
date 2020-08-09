@@ -28,7 +28,7 @@ public class HomePage extends WebPage {
 		add(app4);
 		
 		add(new VueComponent<Object>("app5")
-				.setVueDescriptor("{ data: { count : 0 }}"));
+				.setVueDescriptor("{ data: { count : 0, server: 'Hello from client side' }}"));
 		
 		Form<?> form = new Form<Object>("form");
 		form.add(new AjaxButton("button") {
