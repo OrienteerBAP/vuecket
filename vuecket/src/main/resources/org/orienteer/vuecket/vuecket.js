@@ -1,28 +1,35 @@
 const Vuecket = {
 	install : function(Vue, options) {
 		Vue.mixin({
+			data : function() {
+				return {
+						'vcConfig' : null
+						};
+			},
 			methods : {
-				'$vcCall' : function () {
-						var vcUrl = this.$el.getAttribute("vc-url");
-						if(vcUrl) Wicket.Ajax.ajax({"u":vcUrl,
+				'vcCall' : function () {
+						if(this.vcConfig) Wicket.Ajax.ajax({"u":this.vcConfig.url,
 					    				  "m":"POST",
 					    				  "c":this.$el.id,
 					    				  "ep": { args : JSON.stringify(Array.prototype.slice.call(arguments))}
 					    				  });
 		 			},
-				'$vcApply' : function(patch) {
-					console.log(patch);
-					for(var id in patch) {
-						this[id] = patch[id];
-					}
+				'vcApply' : function(patch) {
+					Object.assign(this, patch);
 				} 
 		 	},
 		 	beforeMount : function() {
-				if(this.$el) this.$vcId = this.$el.id;
+				if(this.$el) {
+					this.$vcId = this.$el.id;
+					this.$data.vcConfig = JSON.parse(this.$el.getAttribute('vc-config'));
+				}
 		 	},
 			mounted : function() {
 				if(this.$vcId) this.$el.id = this.$vcId;
-				else this.$vcId = this.$el.id;
+				else {
+					this.$vcId = this.$el.id;
+					this.$data.vcConfig = JSON.parse(this.$el.getAttribute('vc-config'));
+				}
 			}
 		 });
 	}
@@ -30,6 +37,6 @@ const Vuecket = {
 
 Vue.use(Vuecket);
 
-window.$vc = function(id) {
+Vue.getVueById = function(id) {
 	return document.getElementById(id).__vue__;
 }

@@ -81,7 +81,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		String arguments = RequestCycle.get().getRequest().getRequestParameters()
 				 .getParameterValue("args").toString();
 		System.out.println("Arguments = "+arguments);
-		target.appendJavaScript("$vc('"+getComponent().getMarkupId()+"').$vcApply({server:'hello from server'})");
+		target.appendJavaScript("Vue.getVueById('"+getComponent().getMarkupId()+"').vcApply({server:'hello from server'})");
 	}
 	
 	@Override
@@ -97,8 +97,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	@Override
 	protected void onComponentTag(ComponentTag tag) {
 		super.onComponentTag(tag);
-		
-		tag.put(":vc-url", StringValue.valueOf("'"+JavaScriptUtils.escapeQuotes(getCallbackUrl())+"'"));
+		tag.put("vc-config", String.format("{ \"url\" : \"%s\" }", getCallbackUrl()));
 	}
 
 }
