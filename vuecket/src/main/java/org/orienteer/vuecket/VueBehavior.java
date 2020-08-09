@@ -12,10 +12,13 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
+import org.apache.wicket.util.io.IClusterable;
 import org.apache.wicket.util.string.StringValue;
 import org.orienteer.vuecket.descriptor.IVueDescriptor;
 import org.orienteer.vuecket.descriptor.VueJsonDescriptor;
 import org.orienteer.vuecket.util.VuecketUtils;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	
@@ -23,7 +26,15 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	public static final JavaScriptResourceReference HTTP_VUE_LOADER_JS = new JavaScriptResourceReference(VueComponent.class, "external/http-vue-loader/src/httpVueLoader.js");
 	public static final JavaScriptResourceReference VUECKET_JS = new JavaScriptResourceReference(VueComponent.class, "vuecket.js");
 	
+	private class VueConfigView implements IClusterable {
+		public CharSequence getUrl() {
+			return getCallbackUrl();
+		}
+	}
+	
 	private IVueDescriptor vueDescriptor;
+	
+	private final VueConfigView configView = new VueConfigView();
 	
 	public VueBehavior() {
 		
@@ -97,7 +108,12 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	@Override
 	protected void onComponentTag(ComponentTag tag) {
 		super.onComponentTag(tag);
-		tag.put("vc-config", String.format("{ \"url\" : \"%s\" }", getCallbackUrl()));
+		try {
+			String config = VueSettings.get().getObjectMapper().writeValueAsString(configView);
+			tag.put("vc-config", config );
+		} catch (JsonProcessingException e) {
+			throw new WicketRuntimeException(e);
+		}
 	}
 
 }

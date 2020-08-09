@@ -10,6 +10,8 @@ import org.apache.wicket.request.resource.UrlResourceReference;
 import org.apache.wicket.util.io.IClusterable;
 import org.apache.wicket.util.string.Strings;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class VueSettings {
 	
 	public static final INPMPackageProvider UNPKG_PROVIDER = new NPMCDNPackageProvider("https://unpkg.com/%s/%s");
@@ -51,17 +53,29 @@ public class VueSettings {
 	}
 	
 	private INPMPackageProvider npmPackageProvider;
+	private ObjectMapper objectMapper;
 	
 	protected VueSettings() {
 		npmPackageProvider = UNPKG_PROVIDER;
+		objectMapper = new ObjectMapper();
 	}
 	
 	public INPMPackageProvider getNpmPackageProvider() {
 		return npmPackageProvider;
 	}
 
-	public void setNpmPackageProvider(INPMPackageProvider npmPackageProvider) {
+	public VueSettings setNpmPackageProvider(INPMPackageProvider npmPackageProvider) {
 		this.npmPackageProvider = npmPackageProvider;
+		return this;
+	}
+	
+	public ObjectMapper getObjectMapper() {
+		return objectMapper;
+	}
+	
+	public VueSettings setObjectMapper(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
+		return this;
 	}
 
 	public static VueSettings defaultSettings() {
