@@ -7,6 +7,7 @@ Vuecket allows to be reactive on frontend and backend without coding of REST ser
 2. [Enabling Vuecket](#enabling-vuecket)
 3. [Association of Wicket and Vue Components](#association-of-wicket-and-vue-components)
 4. [Server-side methods](#server-side-methods)
+5. [Subscribing to Vue Events](#subscribing-to-vue-events)
 
 ## Current Progress and Plans
 
@@ -115,4 +116,19 @@ add(new VueComponent<Object>("app5") {
 		{{ server }}
 	</div>
 </div>
+```
+
+## Subscribing to Vue Events
+
+It might be helpful to subscribe to particular Vue Events on server side. To do that you can use `@VueOn` and `@VueOnce` annotations for methods which needs to be invoked if event occur on client side. Example:
+
+```java
+@VueOn("increase")
+public void showIncrease(int count) {
+	System.out.println("On Increase called. Recieved count = "+count);
+}
+```
+
+```html
+<button @click="$emit('increase', count)">Test Emit</button>
 ```
