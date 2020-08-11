@@ -7,13 +7,46 @@ const Vuecket = {
 						};
 			},
 			methods : {
-				'vcCall' : function () {
+				'vcInvoke' : function (method) {
 						if(this.vcConfig) Wicket.Ajax.ajax({"u":this.vcConfig.url,
 					    				  "m":"POST",
 					    				  "c":this.$el.id,
-					    				  "ep": { args : JSON.stringify(Array.prototype.slice.call(arguments))}
+					    				  "ep": {   
+													a : true,
+													m : method,		
+													args : JSON.stringify(Array.prototype.slice.call(arguments, 1))
+												}
 					    				  });
-		 			},
+		 		},
+				'vcCall' : function (method) {
+						if(this.vcConfig) {
+							return new Promise((resolve, reject) => {
+								var ms = this.$vcMailbox;
+								var mailboxId = ms.genBoxId();
+								var sh = function() {
+									var ret = ms[mailboxId];
+									delete ms[mailboxId];
+									resolve(ret);
+								};
+								var fh = function() {
+									delete ms[mailboxId];
+									reject(new Error("Can't retrieve response'"));
+								}
+								Wicket.Ajax.ajax({"u":this.vcConfig.url,
+						    				  "m":"POST",
+						    				  "c":this.$el.id,
+											  "sh":[sh],
+											  "fh":[fh],
+						    				  "ep": {   
+														a : false,
+														m : method,
+														mb : mailboxId,	
+														args : JSON.stringify(Array.prototype.slice.call(arguments, 1))
+													}
+						    				  });
+							});
+						}
+		 		},
 				'vcApply' : function(patch) {
 					Object.assign(this, patch);
 				} 
@@ -39,4 +72,10 @@ Vue.use(Vuecket);
 
 Vue.getVueById = function(id) {
 	return document.getElementById(id).__vue__;
+};
+
+Vue.prototype.$vcMailbox = {
+	genBoxId : function() {
+		return Math.random().toString(36).substring(2, 15);
+	}
 }

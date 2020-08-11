@@ -10,15 +10,18 @@ import org.apache.wicket.core.util.string.JavaScriptUtils;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.util.io.IClusterable;
 import org.apache.wicket.util.string.StringValue;
 import org.orienteer.vuecket.descriptor.IVueDescriptor;
 import org.orienteer.vuecket.descriptor.VueJsonDescriptor;
+import org.orienteer.vuecket.method.IVuecketMethod;
 import org.orienteer.vuecket.util.VuecketUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	
@@ -89,10 +92,26 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 
 	@Override
 	protected void respond(AjaxRequestTarget target) {
-		String arguments = RequestCycle.get().getRequest().getRequestParameters()
-				 .getParameterValue("args").toString();
-		System.out.println("Arguments = "+arguments);
-		target.appendJavaScript("Vue.getVueById('"+getComponent().getMarkupId()+"').vcApply({server:'hello from server'})");
+		IRequestParameters params = RequestCycle.get().getRequest().getRequestParameters();
+		boolean async = params.getParameterValue("a").toBoolean();
+		String method = params.getParameterValue("m").toString();
+		String mailBoxId = params.getParameterValue("mb").toString();
+		String arguments = params.getParameterValue("args").toString();
+		IVuecketMethod.Context ctx = IVuecketMethod.contextFor(this, getComponent(), target, mailBoxId);
+		
+		
+		try {
+			ArrayNode argsNode = (ArrayNode) VueSettings.get().getObjectMapper().readTree(arguments);
+			System.out.println("recieved arguments: "+argsNode);
+			IVuecketMethod<?> m = (context, args) -> args; //Just Echo for now
+			if(async) m.invoke(ctx, argsNode);
+			else m.call(ctx, argsNode);
+		} catch (Exception e) {
+			throw new WicketRuntimeException(e);
+		}
+//		System.out.println("Method = "+arguments);
+//		System.out.println("Arguments = "+arguments);
+//		target.appendJavaScript("Vue.getVueById('"+getComponent().getMarkupId()+"').vcApply({server:'hello from server'})");
 	}
 	
 	@Override
