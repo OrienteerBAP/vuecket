@@ -1,11 +1,16 @@
 package org.orienteer.vuecket.method;
 
+import java.util.Map;
+
 import org.apache.wicket.Component;
+import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.util.io.IClusterable;
 import org.orienteer.vuecket.VueBehavior;
 import org.orienteer.vuecket.VueSettings;
+import org.orienteer.vuecket.util.VuecketUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -60,5 +65,19 @@ public interface IVuecketMethod<R> extends IClusterable {
 	
 	public static Context contextFor(VueBehavior vueBehavior, Component component, AjaxRequestTarget target, String mailBoxId) {
 		return new Context(vueBehavior, component, target, mailBoxId);
+	}
+	
+	public static void pushDataPatch(Context ctx, Object... patchDescription)  {
+		pushDataPatch(ctx, VuecketUtils.toMap(patchDescription));
+	}
+	
+	public static void pushDataPatch(Context ctx, Map<String, ?> patch)  {
+		try {
+			String json = VueSettings.get().getObjectMapper().writeValueAsString(patch);
+			String script = String.format("Vue.getVueById('%s').vcApply(%s)", ctx.getComponent().getMarkupId(), json);
+			ctx.getTarget().appendJavaScript(script);
+		} catch (JsonProcessingException e) {
+			throw new WicketRuntimeException(e);
+		}
 	}
 }

@@ -1,6 +1,11 @@
 package org.orienteer.vuecket;
 
 
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections4.map.HashedMap;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.WicketRuntimeException;
@@ -15,9 +20,12 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.util.io.IClusterable;
 import org.apache.wicket.util.string.StringValue;
+import org.apache.wicket.util.string.Strings;
 import org.orienteer.vuecket.descriptor.IVueDescriptor;
 import org.orienteer.vuecket.descriptor.VueJsonDescriptor;
 import org.orienteer.vuecket.method.IVuecketMethod;
+import org.orienteer.vuecket.method.ReflectionVuecketMethod;
+import org.orienteer.vuecket.method.VueMethod;
 import org.orienteer.vuecket.util.VuecketUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,6 +46,8 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	private IVueDescriptor vueDescriptor;
 	
 	private final VueConfigView configView = new VueConfigView();
+	
+	private final Map<String, IVuecketMethod<?>> vueMethods = new HashedMap<String, IVuecketMethod<?>>();
 	
 	public VueBehavior() {
 		
@@ -102,8 +112,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		
 		try {
 			ArrayNode argsNode = (ArrayNode) VueSettings.get().getObjectMapper().readTree(arguments);
-			System.out.println("recieved arguments: "+argsNode);
-			IVuecketMethod<?> m = (context, args) -> args; //Just Echo for now
+			IVuecketMethod<?> m = vueMethods.get(method);
 			if(async) m.invoke(ctx, argsNode);
 			else m.call(ctx, argsNode);
 		} catch (Exception e) {
@@ -132,6 +141,31 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 			tag.put("vc-config", config );
 		} catch (JsonProcessingException e) {
 			throw new WicketRuntimeException(e);
+		}
+	}
+	
+	public Map<String, IVuecketMethod<?>> getVueMethods() {
+		return vueMethods;
+	}
+	
+	public VueBehavior addVueMethod(String name, IVuecketMethod<?> vueMethod) {
+		vueMethods.put(name, vueMethod);
+		return this;
+	}
+	
+	@Override
+	protected void onBind() {
+		super.onBind();
+		scanForVueMethods(getComponent());
+		scanForVueMethods(this);
+	}
+	
+	private void scanForVueMethods(Object object) {
+		List<Method> methods = VuecketUtils.getMethodsAnnotatedWith(object.getClass(), VueMethod.class);
+		for (Method method : methods) {
+			VueMethod vueMethod = method.getAnnotation(VueMethod.class);
+			String name = Strings.defaultIfEmpty(vueMethod.value(), method.getName());
+			addVueMethod(name, new ReflectionVuecketMethod<Object>(method));
 		}
 	}
 

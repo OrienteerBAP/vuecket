@@ -1,11 +1,14 @@
 package org.orienteer.vuecket;
 
+import java.util.Map;
+
 import org.apache.wicket.markup.html.GenericWebMarkupContainer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.orienteer.vuecket.descriptor.IVueDescriptor;
 import org.orienteer.vuecket.descriptor.VueFileDescriptor;
 import org.orienteer.vuecket.descriptor.VueJsonDescriptor;
+import org.orienteer.vuecket.method.IVuecketMethod;
 
 public class VueComponent<T> extends GenericWebMarkupContainer<T> {
 	
@@ -43,6 +46,15 @@ public class VueComponent<T> extends GenericWebMarkupContainer<T> {
 	
 	public VueComponent<T> setVueDescriptor(ResourceReference reference) {
 		return setVueDescriptor(new VueFileDescriptor(reference));
+	}
+	
+	public Map<String, IVuecketMethod<?>> getVueMethods() {
+		return getVueBehavior().getVueMethods();
+	}
+	
+	public VueComponent<T> addVueMethod(String name, IVuecketMethod<?> vueMethod) {
+		getVueBehavior().addVueMethod(name, vueMethod);
+		return this;
 	}
 
 }

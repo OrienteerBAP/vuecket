@@ -3,6 +3,8 @@ package org.orienteer.vuecket;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.orienteer.vuecket.VueComponent;
+import org.orienteer.vuecket.method.IVuecketMethod;
+import org.orienteer.vuecket.method.VueMethod;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -27,8 +29,12 @@ public class HomePage extends WebPage {
 		app4.add(new VueMarkdown("markdown", "Hello **there**"));
 		add(app4);
 		
-		add(new VueComponent<Object>("app5")
-				.setVueDescriptor("{ data: { count : 0, server: 'Hello from client side' }}"));
+		add(new VueComponent<Object>("app5") {
+			@VueMethod("count")
+			public void updateCountModel(IVuecketMethod.Context ctx, int count) {
+				IVuecketMethod.pushDataPatch(ctx, "server", "Hello from server #"+count);
+			}
+		}.setVueDescriptor("{ data: { count : 0, server: 'Hello from client side' }}"));
 		
 		Form<?> form = new Form<Object>("form");
 		form.add(new AjaxButton("button") {

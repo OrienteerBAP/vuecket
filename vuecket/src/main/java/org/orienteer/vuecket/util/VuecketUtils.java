@@ -1,7 +1,11 @@
 package org.orienteer.vuecket.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.wicket.Component;
@@ -43,5 +47,41 @@ public final class VuecketUtils {
 	
 	public static String randomId() {
 		return "id"+RANDOM.nextInt(1000);
+	}
+	
+	public static List<Method> getMethodsAnnotatedWith(final Class<?> type, final Class<? extends Annotation> annotation) {
+	    final List<Method> methods = new ArrayList<Method>();
+	    Class<?> clazz = type;
+	    while (clazz != Object.class) {
+	        for (final Method method : clazz.getDeclaredMethods()) {
+	            if (method.isAnnotationPresent(annotation)) {
+	                methods.add(method);
+	            }
+	        }
+	        clazz = clazz.getSuperclass();
+	    }
+	    return methods;
+	}
+	
+	/**
+	 * Converts given objects into map.
+	 * Uses pairs of object.
+	 * Call toMap("key1", "value1", "key2", "value2") will returns this map:
+	 * { "key1": "value1", "key2": "value2" }
+	 * Call method with not pair arguments will throw {@link IllegalStateException}.
+	 * For example: toMap("key1", "value1", "key2") - throws {@link IllegalStateException}
+	 * @param objects {@link Object[]} array of objects which will be used for create new map
+	 * @param <K> type of map key
+	 * @param <V> type of map value
+	 * @return {@link Map} created from objects
+	 * @throws IllegalStateException if objects are not pair
+	 */
+	public static final <K, V> Map<K, V> toMap(Object... objects) {
+		if(objects==null || objects.length % 2 !=0) throw new IllegalArgumentException("Illegal arguments provided to construct a map");
+		Map<K, V> ret = new HashMap<K, V>();
+		for(int i=0; i<objects.length; i+=2) {
+			ret.put((K)objects[i], (V)objects[i+1]);
+		}
+		return ret;
 	}
 }
