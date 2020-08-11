@@ -8,6 +8,7 @@ Vuecket allows to be reactive on frontend and backend without coding of REST ser
 3. [Association of Wicket and Vue Components](#association-of-wicket-and-vue-components)
 4. [Server-side methods](#server-side-methods)
 5. [Subscribing to Vue Events](#subscribing-to-vue-events)
+6. [Watch data changes](#watch-data-changes)
 
 ## Current Progress and Plans
 
@@ -15,7 +16,7 @@ Vuecket allows to be reactive on frontend and backend without coding of REST ser
    - [X] From JSON configuration
    - [X] From Vue files
    - [X] From NPM packages
-- [ ] Support of propogation of Vue events to server side
+- [X] Support of propogation of Vue events to server side: $on, $once, $watch
 - [ ] Support of data channels between server side and client
    - [ ] One Time - upon Vue component load
    - [ ] Periodical refresh from server side
@@ -131,4 +132,18 @@ public void showIncrease(int count) {
 
 ```html
 <button @click="$emit('increase', count)">Test Emit</button>
+```
+
+## Watch data changes
+
+In the similiar way you can subscribe server side method to changes of data on client side by using `@VueWatch` annotation
+
+```java
+@VueWatch("count")
+public void countChanged(Integer newCount, Integer oldCount) {
+	System.out.println("Count changed from "+oldCount+" to "+newCount);
+}
+```
+```html
+<button @click="count++">Clicked {{count}} times</button>
 ```
