@@ -6,6 +6,7 @@ import org.orienteer.vuecket.VueComponent;
 import org.orienteer.vuecket.method.IVuecketMethod;
 import org.orienteer.vuecket.method.VueMethod;
 import org.orienteer.vuecket.method.VueOn;
+import org.orienteer.vuecket.method.VueWatch;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -31,7 +32,7 @@ public class HomePage extends WebPage {
 		add(app4);
 		
 		add(new VueComponent<Object>("app5") {
-			@VueMethod("count")
+			@VueMethod("serverCount")
 			public void updateCountModel(IVuecketMethod.Context ctx, int count) {
 				IVuecketMethod.pushDataPatch(ctx, "server", "Hello from server #"+count);
 			}
@@ -39,6 +40,11 @@ public class HomePage extends WebPage {
 			@VueOn("increase")
 			public void showIncrease(int count) {
 				System.out.println("On Increase called. Recieved count = "+count);
+			}
+			
+			@VueWatch("count")
+			public void countChanged(Integer newCount, Integer oldCount) {
+				System.out.println("Count changed from "+oldCount+" to "+newCount);
 			}
 		}.setVueDescriptor("{ data: { count : 0, server: 'Hello from client side' }}"));
 		

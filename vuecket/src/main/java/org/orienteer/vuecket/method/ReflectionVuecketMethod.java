@@ -46,7 +46,7 @@ public class ReflectionVuecketMethod<R> implements IVuecketMethod<R> {
 			vals[0] = ctx;
 			shift=1;
 		}
-		for(int indx = 0; indx < args.size(); indx++) {
+		for(int indx = 0; indx < args.size() && indx+shift < vals.length; indx++) {
 			vals[indx+shift] = om.treeToValue(args.get(indx), parameterTypes[indx+shift]);
 		}
 		return (R) method.invoke(obj, vals);

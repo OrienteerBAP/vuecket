@@ -63,18 +63,18 @@ const Vuecket = {
 					this.$vcId = this.$el.id;
 					this.$data.vcConfig = JSON.parse(this.$el.getAttribute('vc-config'));
 				}
-				if(this.vcConfig.on) 
-					this.vcConfig.on.forEach(m => this.$on(m, function(){
-						var args = Array.prototype.slice.call(arguments);
-						args.unshift(m);
-						this.vcInvoke.apply(this, args);
-					}));
-				if(this.vcConfig.once) 
-					this.vcConfig.once.forEach(m => this.$once(m, function(){
-						var args = Array.prototype.slice.call(arguments);
-						args.unshift(m);
-						this.vcInvoke.apply(this, args);
-					}));
+				var registerMethods = function (collection, vueFunction) {
+					if(collection) {
+						collection.forEach(m => vueFunction.call(this, m, function(){
+							var args = Array.prototype.slice.call(arguments);
+							args.unshift(m);
+							this.vcInvoke.apply(this, args);
+						}));
+					}
+				};
+				registerMethods.call(this, this.vcConfig.on, this.$on);
+				registerMethods.call(this, this.vcConfig.once, this.$once);
+				registerMethods.call(this, this.vcConfig.watch, this.$watch);
 			}
 		 });
 	}

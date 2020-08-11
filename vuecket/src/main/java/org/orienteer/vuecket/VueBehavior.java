@@ -30,6 +30,7 @@ import org.orienteer.vuecket.method.ReflectionVuecketMethod;
 import org.orienteer.vuecket.method.VueMethod;
 import org.orienteer.vuecket.method.VueOn;
 import org.orienteer.vuecket.method.VueOnce;
+import org.orienteer.vuecket.method.VueWatch;
 import org.orienteer.vuecket.util.VuecketUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,10 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		public Collection<String> getOnce() {
 			return vueOnceMethods.keySet();
 		}
+		
+		public Collection<String> getWatch() {
+			return vueWatchMethods.keySet();
+		}
 	}
 	
 	private IVueDescriptor vueDescriptor;
@@ -68,6 +73,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	private final Map<String, IVuecketMethod<?>> vueMethods = new HashedMap<String, IVuecketMethod<?>>();
 	private final Map<String, IVuecketMethod<?>> vueOnMethods = new HashedMap<String, IVuecketMethod<?>>();
 	private final Map<String, IVuecketMethod<?>> vueOnceMethods = new HashedMap<String, IVuecketMethod<?>>();
+	private final Map<String, IVuecketMethod<?>> vueWatchMethods = new HashedMap<String, IVuecketMethod<?>>();
 	
 	public VueBehavior() {
 		
@@ -150,6 +156,8 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		ret = vueOnMethods.get(methodName);
 		if(ret!=null) return ret;
 		ret = vueOnceMethods.get(methodName);
+		if(ret!=null) return ret;
+		ret = vueWatchMethods.get(methodName);
 		return ret;
 	}
 	
@@ -201,6 +209,15 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		return this;
 	}
 	
+	public Map<String, IVuecketMethod<?>> getVueWatchMethods() {
+		return vueWatchMethods;
+	}
+	
+	public VueBehavior addVueWatchMethod(String name, IVuecketMethod<?> vueMethod) {
+		vueWatchMethods.put(name, vueMethod);
+		return this;
+	}
+	
 	@Override
 	protected void onBind() {
 		super.onBind();
@@ -212,6 +229,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		scanForAnnotation(object, VueMethod.class, vueMethods);
 		scanForAnnotation(object, VueOn.class, vueOnMethods);
 		scanForAnnotation(object, VueOnce.class, vueOnceMethods);
+		scanForAnnotation(object, VueWatch.class, vueWatchMethods);
 	}
 	
 	private void scanForAnnotation(Object object, Class<? extends Annotation> annotationClazz, Map<String, IVuecketMethod<?>> map) {

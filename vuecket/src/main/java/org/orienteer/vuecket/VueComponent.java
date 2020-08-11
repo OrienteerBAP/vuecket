@@ -75,5 +75,14 @@ public class VueComponent<T> extends GenericWebMarkupContainer<T> {
 		getVueBehavior().addVueOnceMethod(name, vueMethod);
 		return this;
 	}
+	
+	public Map<String, IVuecketMethod<?>> getVueWatchMethods() {
+		return getVueBehavior().getVueWatchMethods();
+	}
+	
+	public VueComponent<T> addVueWatchMethod(String name, IVuecketMethod<?> vueMethod) {
+		getVueBehavior().addVueWatchMethod(name, vueMethod);
+		return this;
+	}
 
 }
