@@ -1,14 +1,15 @@
 # vuecket
-Power of Vue.JS married with magic of Apache Wicket
+Power of [Vue.JS](https://vuejs.org/) married with magic of [Apache Wicket](https://wicket.apache.org/)
 
 Vuecket allows to be reactive on frontend and backend without coding of REST services.
 
 1. [Progress and Plans](#current-progress-and-plans)
-2. [Enabling Vuecket](#enabling-vuecket)
-3. [Association of Wicket and Vue Components](#association-of-wicket-and-vue-components)
-4. [Server-side methods](#server-side-methods)
-5. [Subscribing to Vue Events](#subscribing-to-vue-events)
-6. [Watch data changes](#watch-data-changes)
+1. [Guiding Principles](#guiding-principles)
+1. [Enabling Vuecket](#enabling-vuecket)
+1. [Association of Wicket and Vue Components](#association-of-wicket-and-vue-components)
+1. [Server-side methods](#server-side-methods)
+1. [Subscribing to Vue Events](#subscribing-to-vue-events)
+1. [Watch data changes](#watch-data-changes)
 
 ## Current Progress and Plans
 
@@ -22,6 +23,17 @@ Vuecket allows to be reactive on frontend and backend without coding of REST ser
    - [ ] Periodical refresh from server side
    - [ ] WebSocket based refresh from server side
 - [X] Support of server based Vue methods
+
+## Guiding Principles
+
+Vuecket idealogy following the following principals:
+
+1. Be declarative, not imperative
+   * Vue.js components can be not aware about Vuecket. It allows to get Vuecket benefits even from 3rd party Vue.js components
+   * In similiar way, Apache Wicket can enable benefits Vuecket benefits by using VueBehavior. There is no need to extend special VueComponent or VuecketApplication: they are made for a little more convenience.
+1. Provide 80% of functionality Out Of the Box, but do have good extension points for remaining 20%.
+
+As you can see, btw, both Vue.Js and Apache Wicket fit this Guiding Principles as well. 
 
 ## Enabling Vuecket
 
