@@ -1,7 +1,9 @@
 package org.orienteer.vuecket;
 
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +28,13 @@ import org.orienteer.vuecket.descriptor.VueJsonDescriptor;
 import org.orienteer.vuecket.method.IVuecketMethod;
 import org.orienteer.vuecket.method.ReflectionVuecketMethod;
 import org.orienteer.vuecket.method.VueMethod;
+import org.orienteer.vuecket.method.VueOn;
+import org.orienteer.vuecket.method.VueOnce;
 import org.orienteer.vuecket.util.VuecketUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -37,9 +44,20 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	public static final JavaScriptResourceReference HTTP_VUE_LOADER_JS = new JavaScriptResourceReference(VueComponent.class, "external/http-vue-loader/src/httpVueLoader.js");
 	public static final JavaScriptResourceReference VUECKET_JS = new JavaScriptResourceReference(VueComponent.class, "vuecket.js");
 	
+	private static final Logger LOG = LoggerFactory.getLogger(VueBehavior.class);
+	
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private class VueConfigView implements IClusterable {
 		public CharSequence getUrl() {
 			return getCallbackUrl();
+		}
+		
+		public Collection<String> getOn() {
+			return vueOnMethods.keySet();
+		}
+		
+		public Collection<String> getOnce() {
+			return vueOnceMethods.keySet();
 		}
 	}
 	
@@ -48,6 +66,8 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	private final VueConfigView configView = new VueConfigView();
 	
 	private final Map<String, IVuecketMethod<?>> vueMethods = new HashedMap<String, IVuecketMethod<?>>();
+	private final Map<String, IVuecketMethod<?>> vueOnMethods = new HashedMap<String, IVuecketMethod<?>>();
+	private final Map<String, IVuecketMethod<?>> vueOnceMethods = new HashedMap<String, IVuecketMethod<?>>();
 	
 	public VueBehavior() {
 		
@@ -105,22 +125,32 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		IRequestParameters params = RequestCycle.get().getRequest().getRequestParameters();
 		boolean async = params.getParameterValue("a").toBoolean();
 		String method = params.getParameterValue("m").toString();
-		String mailBoxId = params.getParameterValue("mb").toString();
+		String mailBoxId = params.getParameterValue("mb").toOptionalString();
 		String arguments = params.getParameterValue("args").toString();
 		IVuecketMethod.Context ctx = IVuecketMethod.contextFor(this, getComponent(), target, mailBoxId);
 		
 		
 		try {
 			ArrayNode argsNode = (ArrayNode) VueSettings.get().getObjectMapper().readTree(arguments);
-			IVuecketMethod<?> m = vueMethods.get(method);
+			IVuecketMethod<?> m = lookupMethod(method);
+			if(m==null) {
+				LOG.warn("Vue method for '%s' was not found", method);
+				return;
+			}
 			if(async) m.invoke(ctx, argsNode);
 			else m.call(ctx, argsNode);
 		} catch (Exception e) {
 			throw new WicketRuntimeException(e);
 		}
-//		System.out.println("Method = "+arguments);
-//		System.out.println("Arguments = "+arguments);
-//		target.appendJavaScript("Vue.getVueById('"+getComponent().getMarkupId()+"').vcApply({server:'hello from server'})");
+	}
+	
+	protected IVuecketMethod<?> lookupMethod(String methodName) {
+		IVuecketMethod<?> ret = vueMethods.get(methodName);
+		if(ret!=null) return ret;
+		ret = vueOnMethods.get(methodName);
+		if(ret!=null) return ret;
+		ret = vueOnceMethods.get(methodName);
+		return ret;
 	}
 	
 	@Override
@@ -153,19 +183,43 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		return this;
 	}
 	
+	public Map<String, IVuecketMethod<?>> getVueOnMethods() {
+		return vueOnMethods;
+	}
+	
+	public VueBehavior addVueOnMethod(String name, IVuecketMethod<?> vueMethod) {
+		vueOnMethods.put(name, vueMethod);
+		return this;
+	}
+	
+	public Map<String, IVuecketMethod<?>> getVueOnceMethods() {
+		return vueOnceMethods;
+	}
+	
+	public VueBehavior addVueOnceMethod(String name, IVuecketMethod<?> vueMethod) {
+		vueOnceMethods.put(name, vueMethod);
+		return this;
+	}
+	
 	@Override
 	protected void onBind() {
 		super.onBind();
-		scanForVueMethods(getComponent());
-		scanForVueMethods(this);
+		scanForAnnotations(getComponent());
+		scanForAnnotations(this);
 	}
 	
-	private void scanForVueMethods(Object object) {
-		List<Method> methods = VuecketUtils.getMethodsAnnotatedWith(object.getClass(), VueMethod.class);
+	private void scanForAnnotations(Object object) {
+		scanForAnnotation(object, VueMethod.class, vueMethods);
+		scanForAnnotation(object, VueOn.class, vueOnMethods);
+		scanForAnnotation(object, VueOnce.class, vueOnceMethods);
+	}
+	
+	private void scanForAnnotation(Object object, Class<? extends Annotation> annotationClazz, Map<String, IVuecketMethod<?>> map) {
+		List<Method> methods = VuecketUtils.getMethodsAnnotatedWith(object.getClass(), annotationClazz);
 		for (Method method : methods) {
-			VueMethod vueMethod = method.getAnnotation(VueMethod.class);
-			String name = Strings.defaultIfEmpty(vueMethod.value(), method.getName());
-			addVueMethod(name, new ReflectionVuecketMethod<Object>(method));
+			Annotation annotation = method.getAnnotation(annotationClazz);
+			String name = Strings.defaultIfEmpty(VuecketUtils.getAnnotationValue(annotation), method.getName());
+			map.put(name, new ReflectionVuecketMethod<Object>(method));
 		}
 	}
 

@@ -1,6 +1,7 @@
 package org.orienteer.vuecket.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,6 +10,8 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.WicketRuntimeException;
+import org.apache.wicket.util.string.Strings;
 import org.orienteer.vuecket.VueBehavior;
 import org.orienteer.vuecket.VueComponent;
 
@@ -83,5 +86,20 @@ public final class VuecketUtils {
 			ret.put((K)objects[i], (V)objects[i+1]);
 		}
 		return ret;
+	}
+	
+	public static <V> V getAnnotationValue(Annotation ann) {
+		return getAnnotationValue(ann, "value");
+	}
+	
+	public static <V> V getAnnotationValue(Annotation ann, String attr) {
+		if(ann==null || Strings.isEmpty(attr)) return null;
+		try {
+			Method method = ann.annotationType().getDeclaredMethod(attr);
+			method.setAccessible(true);
+			return (V) method.invoke(ann);
+		} catch (Exception e) {
+			throw new WicketRuntimeException("Can't read '"+attr+" from annotation: "+ann,e);
+		} 
 	}
 }

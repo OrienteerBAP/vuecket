@@ -36,6 +36,7 @@
 			<div wicket:id="app5">
 				<button @click="count++; vcInvoke('count', count)">Clicked {{count}} times</button>
 				{{ server }}
+				<button @click="$emit('increase', count)">Test Emit</button>
 			</div>
 		</div>
 		<form wicket:id="form">

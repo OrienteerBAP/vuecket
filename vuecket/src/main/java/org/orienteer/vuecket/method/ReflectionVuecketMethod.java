@@ -51,5 +51,10 @@ public class ReflectionVuecketMethod<R> implements IVuecketMethod<R> {
 		}
 		return (R) method.invoke(obj, vals);
 	}
+	
+	@Override
+	public String toString() {
+		return "VueMethod for "+declaringClass.getName()+"."+methodName+"(...)";
+	}
 
 }

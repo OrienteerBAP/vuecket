@@ -48,12 +48,31 @@ public class VueComponent<T> extends GenericWebMarkupContainer<T> {
 		return setVueDescriptor(new VueFileDescriptor(reference));
 	}
 	
+	
 	public Map<String, IVuecketMethod<?>> getVueMethods() {
 		return getVueBehavior().getVueMethods();
 	}
 	
 	public VueComponent<T> addVueMethod(String name, IVuecketMethod<?> vueMethod) {
 		getVueBehavior().addVueMethod(name, vueMethod);
+		return this;
+	}
+	
+	public Map<String, IVuecketMethod<?>> getVueOnMethods() {
+		return getVueBehavior().getVueOnMethods();
+	}
+	
+	public VueComponent<T> addVueOnMethod(String name, IVuecketMethod<?> vueMethod) {
+		getVueBehavior().addVueOnMethod(name, vueMethod);
+		return this;
+	}
+	
+	public Map<String, IVuecketMethod<?>> getVueOnceMethods() {
+		return getVueBehavior().getVueOnceMethods();
+	}
+	
+	public VueComponent<T> addVueOnceMethod(String name, IVuecketMethod<?> vueMethod) {
+		getVueBehavior().addVueOnceMethod(name, vueMethod);
 		return this;
 	}
 
