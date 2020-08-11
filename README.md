@@ -1,7 +1,12 @@
 # vuecket
 Power of Vue.JS married with magic of Apache Wicket
 
-Vuecket is in early stage of development. Please refer to the following document for more details: https://docs.google.com/document/d/1Lj4LqebeZFkYGsfyC2K7upUl8VpBeAE49Q-BLtvhpFM/edit?usp=sharing
+Vuecket allows to be reactive on frontend and backend without coding of REST services.
+
+1. [Progress and Plans](#current-progress-and-plans)
+2. [Enabling Vuecket](#enabling-vuecket)
+3. [Association of Wicket and Vue Components](#association-of-wicket-and-vue-components)
+4. [Server-side methods](#server-side-methods)
 
 ## Current Progress and Plans
 
@@ -14,9 +19,9 @@ Vuecket is in early stage of development. Please refer to the following document
    - [ ] One Time - upon Vue component load
    - [ ] Periodical refresh from server side
    - [ ] WebSocket based refresh from server side
-- [ ] Support of server based Vue methods
+- [X] Support of server based Vue methods
 
-# Enabling Vuecket
+## Enabling Vuecket
 
 Add the following dependency into your `pom.xml`:
 
@@ -28,8 +33,17 @@ Add the following dependency into your `pom.xml`:
 </dependency>
 ```
 
-You have different ways how to associate Wicket HTML markup components with Vue Components
+## Association of Wicket and Vue Components
 
+To start using of Vuecket power you should associate your server-side component(Wicket) and client-side component(Vue.js).
+You have 2 ways how to do that: 
+* either through Annotations 
+* or java code.
+
+Vue.js components can be also defined by:
+* JSON description
+* VUE file
+* NPM package
 
 ### Annotations
 
@@ -71,4 +85,34 @@ add(new VueComponent<String>("app2")
 );
 
 add(new Label("app3").add(new VueBehavior(new VueJsonDescriptor("{ data: { message : 'Hello Vue'}}"))));
+```
+
+## Server-side methods
+
+Vuecket can work transparantly for Vue code. But you can add more spice by invoking server based methods from your Vue code.
+
+There are 2 ways how you can use Vuecket server methods:
+
+* `vcInvoke` - asynchronous invokation of server method. No reply from server expected. But server side method has possiblity to "push" some changes to the client side, if needed.
+* `vcCall` - return Promise which will contain response from server side 
+
+Example from test Vuecket application:
+
+```java
+add(new VueComponent<Object>("app5") {
+	@VueMethod("count")
+	public void updateCountModel(IVuecketMethod.Context ctx, int count) {
+		IVuecketMethod.pushDataPatch(ctx, "server", "Hello from server #"+count);
+	}
+}.setVueDescriptor("{ data: { count : 0, server: 'Hello from client side' }}"));
+```
+
+```html
+<div>
+	<h1>App #5</h1>
+	<div wicket:id="app5">
+		<button @click="count++; vcInvoke('count', count)">Clicked {{count}} times</button>
+		{{ server }}
+	</div>
+</div>
 ```
