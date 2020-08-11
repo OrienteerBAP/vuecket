@@ -9,12 +9,16 @@ import org.orienteer.vuecket.method.VueOn;
 import org.orienteer.vuecket.method.VueWatch;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.WebPage;
 
 public class HomePage extends WebPage {
 	private static final long serialVersionUID = 1L;
+	
+	private static final IModel<String> HELLO_MODEL = Model.of("Hello from server");
 
 	public HomePage(final PageParameters parameters) {
 		super(parameters);
@@ -47,6 +51,12 @@ public class HomePage extends WebPage {
 				System.out.println("Count changed from "+oldCount+" to "+newCount);
 			}
 		}.setVueDescriptor("{ data: { count : 0, server: 'Hello from client side' }}"));
+		
+		VueComponent<Object> app6 = new VueComponent<Object>("app6", HELLO_MODEL)
+										.setVueDescriptor("{ data: { text : 'Hello Vue'}}")
+										.addDataFiber("text");
+		app6.add(new VueMarkdown("markdown", ""));
+		add(app6);
 		
 		Form<?> form = new Form<Object>("form");
 		form.add(new AjaxButton("button") {

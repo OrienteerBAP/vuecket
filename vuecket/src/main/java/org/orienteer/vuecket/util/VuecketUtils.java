@@ -11,6 +11,8 @@ import java.util.Random;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.WicketRuntimeException;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.IObjectClassAwareModel;
 import org.apache.wicket.util.string.Strings;
 import org.orienteer.vuecket.VueBehavior;
 import org.orienteer.vuecket.VueComponent;
@@ -101,5 +103,11 @@ public final class VuecketUtils {
 		} catch (Exception e) {
 			throw new WicketRuntimeException("Can't read '"+attr+" from annotation: "+ann,e);
 		} 
+	}
+	
+	public static Class<?> getValueClass(IModel<?> model) {
+		if(model instanceof IObjectClassAwareModel) return ((IObjectClassAwareModel<?>)model).getObjectClass();
+		Object value = model.getObject();
+		return value!=null?value.getClass():null;
 	}
 }

@@ -84,5 +84,35 @@ public class VueComponent<T> extends GenericWebMarkupContainer<T> {
 		getVueBehavior().addVueWatchMethod(name, vueMethod);
 		return this;
 	}
+	
+	public <M> VueComponent<T> addDataFiber(String name) {
+		getVueBehavior().addDataFiber(name, getDefaultModel());
+		return this;
+	}
+	
+	public <M> VueComponent<T> addDataFiber(String name, boolean load, boolean observe) {
+		getVueBehavior().addDataFiber(name, getDefaultModel(), load, observe);
+		return this;
+	}
+	
+	public <M> VueComponent<T> addDataFiber(String name, IModel<M> model) {
+		getVueBehavior().addDataFiber(name, model);
+		return this;
+	}
+	
+	public <M> VueComponent<T> addDataFiber(String name, IModel<M> model, boolean load, boolean observe) {
+		getVueBehavior().addDataFiber(name, model, load, observe);
+		return this;
+	}
+	
+	public <M> VueComponent<T> removeDataFiber(String name) {
+		getVueBehavior().removeDataFiber(name);
+		return this;
+	}
+	
+	public <M> VueComponent<T> removeDataFiber(String name, boolean load, boolean observe) {
+		getVueBehavior().removeDataFiber(name, load, observe);
+		return this;
+	}
 
 }

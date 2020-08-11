@@ -6,6 +6,7 @@ import org.apache.wicket.markup.html.IPackageResourceGuard;
 import org.apache.wicket.markup.html.SecurePackageResourceGuard;
 import org.orienteer.vuecket.descriptor.IVueDescriptor;
 import org.orienteer.vuecket.descriptor.VueJsonDescriptor;
+import org.orienteer.vuecket.util.FixWICKET6815;
 import org.orienteer.vuecket.util.VuecketUtils;
 
 public class VuecketInitializer implements IInitializer{
@@ -27,6 +28,7 @@ public class VuecketInitializer implements IInitializer{
 				comp.add(new VueBehavior(vueDescriptor));
 			}
 		});
+		FixWICKET6815.fix();
 	}
 
 	@Override

@@ -49,7 +49,11 @@ const Vuecket = {
 		 		},
 				'vcApply' : function(patch) {
 					Object.assign(this, patch);
-				} 
+				},
+				'vcLoad' : function(names) {
+					if(!names) names = this.vcConfig.load;
+					this.vcInvoke("vcLoad", names);
+				}
 		 	},
 		 	beforeMount : function() {
 				if(this.$el) {
@@ -75,6 +79,14 @@ const Vuecket = {
 				registerMethods.call(this, this.vcConfig.on, this.$on);
 				registerMethods.call(this, this.vcConfig.once, this.$once);
 				registerMethods.call(this, this.vcConfig.watch, this.$watch);
+				if(this.vcConfig.load) {
+					this.vcLoad();
+				}
+				if(this.vcConfig.observe) {
+					this.vcConfig.observe.forEach(m => this.$watch(m, function(newValue){
+							this.vcInvoke("vcObserved", m, newValue);
+						}));
+				}
 			}
 		 });
 	}

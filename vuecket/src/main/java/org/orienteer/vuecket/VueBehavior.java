@@ -4,19 +4,19 @@ package org.orienteer.vuecket;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections4.map.HashedMap;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.core.util.string.JavaScriptUtils;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class VueBehavior extends AbstractDefaultAjaxBehavior {
@@ -64,16 +66,27 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		public Collection<String> getWatch() {
 			return vueWatchMethods.keySet();
 		}
+		
+		public Collection<String> getLoad() {
+			return loadDataFibers.keySet();
+		}
+		
+		public Collection<String> getObserve() {
+			return observeDataFibers.keySet();
+		}
 	}
 	
 	private IVueDescriptor vueDescriptor;
 	
 	private final VueConfigView configView = new VueConfigView();
 	
-	private final Map<String, IVuecketMethod<?>> vueMethods = new HashedMap<String, IVuecketMethod<?>>();
-	private final Map<String, IVuecketMethod<?>> vueOnMethods = new HashedMap<String, IVuecketMethod<?>>();
-	private final Map<String, IVuecketMethod<?>> vueOnceMethods = new HashedMap<String, IVuecketMethod<?>>();
-	private final Map<String, IVuecketMethod<?>> vueWatchMethods = new HashedMap<String, IVuecketMethod<?>>();
+	private final Map<String, IVuecketMethod<?>> vueMethods = new HashMap<String, IVuecketMethod<?>>();
+	private final Map<String, IVuecketMethod<?>> vueOnMethods = new HashMap<String, IVuecketMethod<?>>();
+	private final Map<String, IVuecketMethod<?>> vueOnceMethods = new HashMap<String, IVuecketMethod<?>>();
+	private final Map<String, IVuecketMethod<?>> vueWatchMethods = new HashMap<String, IVuecketMethod<?>>();
+	
+	private final Map<String, IModel<?>> loadDataFibers = new HashMap<String, IModel<?>>();
+	private final Map<String, IModel<?>> observeDataFibers = new HashMap<String, IModel<?>>();
 	
 	public VueBehavior() {
 		
@@ -218,11 +231,66 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		return this;
 	}
 	
+	public <M> VueBehavior addDataFiber(String name, IModel<M> model) {
+		return addDataFiber(name, model, true, true);
+	}
+	
+	public <M> VueBehavior addDataFiber(String name, IModel<M> model, boolean load, boolean observe) {
+		if(model==null) throw new WicketRuntimeException("Model for datafiber '"+name+"' shouldn't be null");
+		if(load) loadDataFibers.put(name, model);
+		if(observe) observeDataFibers.put(name, model);
+		return this;
+	}
+	
+	public <M> VueBehavior removeDataFiber(String name) {
+		return removeDataFiber(name, true, true);
+	}
+	
+	public <M> VueBehavior removeDataFiber(String name, boolean load, boolean observe) {
+		if(load) loadDataFibers.remove(name);
+		if(observe) observeDataFibers.remove(name);
+		return this;
+	}
+	
 	@Override
 	protected void onBind() {
 		super.onBind();
 		scanForAnnotations(getComponent());
 		scanForAnnotations(this);
+	}
+	
+	@VueMethod
+	public void vcLoad(IVuecketMethod.Context ctx, Collection<String> toBeLoaded) {
+		if(toBeLoaded==null || toBeLoaded.isEmpty()) toBeLoaded = loadDataFibers.keySet();
+		Map<String, Object> loadPatch = new HashMap<String, Object>();
+		for (String name : toBeLoaded) {
+			IModel<?> model = loadDataFibers.get(name);
+			if(model!=null) loadPatch.put(name, model.getObject());
+		}
+		IVuecketMethod.pushDataPatch(ctx, loadPatch);
+	}
+	
+	@VueMethod
+	public void vcObserved(IVuecketMethod.Context ctx, String name, TreeNode node) throws JsonProcessingException {
+		IModel<Object> model = (IModel<Object>) observeDataFibers.get(name);
+		if(model==null) {
+			LOG.warn("Observing model '%s' was not found", name);
+			return;
+		}
+		Class<?> requiredClass = VuecketUtils.getValueClass(model);
+		if(requiredClass==null) {
+			LOG.warn("Required class for observing model '%s' was not detected. Recommed to define it explicitly.", name);
+			return;
+		}
+		Object newValue = VueSettings.get().getObjectMapper().treeToValue(node, requiredClass);
+		model.setObject(newValue);
+	}
+	
+	@Override
+	public void detach(Component component) {
+		super.detach(component);
+		for(IModel<?> model : loadDataFibers.values()) model.detach();
+		for(IModel<?> model : observeDataFibers.values()) model.detach();
 	}
 	
 	private void scanForAnnotations(Object object) {
