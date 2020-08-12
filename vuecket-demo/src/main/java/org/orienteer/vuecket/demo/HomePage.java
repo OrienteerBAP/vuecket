@@ -12,8 +12,7 @@ public class HomePage extends WebPage {
 	public HomePage(final PageParameters parameters) {
 		super(parameters);
 		add(new VueComponent<String>("app")
-				.setVueDescriptor("{ data: { message : 'Hello Vue'}}")
-		);
+				.add(new VueMarkdown("markdown", "# Hello World from Vuecket")));
 
 	}
 }
