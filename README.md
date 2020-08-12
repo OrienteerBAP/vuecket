@@ -10,6 +10,7 @@ Vuecket allows to be reactive on frontend and backend without coding of REST ser
 1. [Server-side methods](#server-side-methods)
 1. [Subscribing to Vue Events](#subscribing-to-vue-events)
 1. [Watch data changes](#watch-data-changes)
+1. [Data Fibers](#data-fibers)
 
 ## Current Progress and Plans
 
@@ -19,7 +20,8 @@ Vuecket allows to be reactive on frontend and backend without coding of REST ser
    - [X] From NPM packages
 - [X] Support of propogation of Vue events to server side: $on, $once, $watch
 - [ ] Support of data channels between server side and client
-   - [ ] One Time - upon Vue component load
+   - [X] One Time - upon Vue component load
+   - [X] Observe - push changes to server side IMobel if they are changed on client one
    - [ ] Periodical refresh from server side
    - [ ] WebSocket based refresh from server side
 - [X] Support of server based Vue methods
@@ -159,3 +161,35 @@ public void countChanged(Integer newCount, Integer oldCount) {
 ```html
 <button @click="count++">Clicked {{count}} times</button>
 ```
+
+## Data Fibers
+
+Data fiber is a way to synchronize data between server side and browser. There are different types of data-fibers
+
+* `load` - data will be provided only for initial Vue component loading
+* `observe` - data will be sent back to server upon any change
+* `refresh` - data periodically checked for changes and if there are any - they will be uploaded (NOT YET SUPPORTED)
+* `wspush` - data pushed to client server through WebSocket if there are changes (NOT YET SUPPORTED)
+
+Example:
+
+```java
+//Value of this model will be initially load to all connected clients and then kept update upon changes
+private static final IModel<String> HELLO_MODEL = Model.of("Hello from server");
+...
+VueComponent<Object> app6 = new VueComponent<Object>("app6", HELLO_MODEL)
+				.setVueDescriptor("{ data: { text : 'Hello Vue'}}")
+				.addDataFiber("text");  // <===Pay attention to this call. It binds default IModel to 'text' data fiber
+app6.add(new VueMarkdown("markdown", ""));
+add(app6);
+```
+```html
+<div>
+	<h1>App #6</h1>
+	<div wicket:id="app6">
+		<textarea v-model="text"></textarea>
+		<vue-markdown wicket:id="markdown" v-bind:source="text">Application 6</vue-markdown>
+	</div>
+</div>
+```
+
