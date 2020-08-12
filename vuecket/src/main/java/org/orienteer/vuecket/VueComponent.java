@@ -10,7 +10,7 @@ import org.orienteer.vuecket.descriptor.VueFileDescriptor;
 import org.orienteer.vuecket.descriptor.VueJsonDescriptor;
 import org.orienteer.vuecket.method.IVuecketMethod;
 
-public class VueComponent<T> extends GenericWebMarkupContainer<T> {
+public class VueComponent<T> extends GenericWebMarkupContainer<T> implements IVueComponent<VueComponent<T>> {
 	
 	private final VueBehavior vueBehavior;
 	
@@ -26,93 +26,9 @@ public class VueComponent<T> extends GenericWebMarkupContainer<T> {
 	public VueBehavior getVueBehavior() {
 		return vueBehavior;
 	}
-	
-	public IVueDescriptor getVueDescriptor() {
-		return getVueBehavior().getVueDescriptor();
-	}
-	
-	public VueComponent<T> setVueDescriptor(IVueDescriptor vueDescriptor) {
-		getVueBehavior().setVueDescriptor(vueDescriptor);
-		return this;
-	}
-	
-	public VueComponent<T> setVueDescriptor(String name, String vueDescriptor) {
-		return setVueDescriptor(new VueJsonDescriptor(name, vueDescriptor));
-	}
-	
-	public VueComponent<T> setVueDescriptor(String vueDescriptor) {
-		return setVueDescriptor(new VueJsonDescriptor(vueDescriptor));
-	}
-	
-	public VueComponent<T> setVueDescriptor(ResourceReference reference) {
-		return setVueDescriptor(new VueFileDescriptor(reference));
-	}
-	
-	
-	public Map<String, IVuecketMethod<?>> getVueMethods() {
-		return getVueBehavior().getVueMethods();
-	}
-	
-	public VueComponent<T> addVueMethod(String name, IVuecketMethod<?> vueMethod) {
-		getVueBehavior().addVueMethod(name, vueMethod);
-		return this;
-	}
-	
-	public Map<String, IVuecketMethod<?>> getVueOnMethods() {
-		return getVueBehavior().getVueOnMethods();
-	}
-	
-	public VueComponent<T> addVueOnMethod(String name, IVuecketMethod<?> vueMethod) {
-		getVueBehavior().addVueOnMethod(name, vueMethod);
-		return this;
-	}
-	
-	public Map<String, IVuecketMethod<?>> getVueOnceMethods() {
-		return getVueBehavior().getVueOnceMethods();
-	}
-	
-	public VueComponent<T> addVueOnceMethod(String name, IVuecketMethod<?> vueMethod) {
-		getVueBehavior().addVueOnceMethod(name, vueMethod);
-		return this;
-	}
-	
-	public Map<String, IVuecketMethod<?>> getVueWatchMethods() {
-		return getVueBehavior().getVueWatchMethods();
-	}
-	
-	public VueComponent<T> addVueWatchMethod(String name, IVuecketMethod<?> vueMethod) {
-		getVueBehavior().addVueWatchMethod(name, vueMethod);
-		return this;
-	}
-	
-	public <M> VueComponent<T> addDataFiber(String name) {
-		getVueBehavior().addDataFiber(name, getDefaultModel());
-		return this;
-	}
-	
-	public <M> VueComponent<T> addDataFiber(String name, boolean load, boolean observe) {
-		getVueBehavior().addDataFiber(name, getDefaultModel(), load, observe);
-		return this;
-	}
-	
-	public <M> VueComponent<T> addDataFiber(String name, IModel<M> model) {
-		getVueBehavior().addDataFiber(name, model);
-		return this;
-	}
-	
-	public <M> VueComponent<T> addDataFiber(String name, IModel<M> model, boolean load, boolean observe) {
-		getVueBehavior().addDataFiber(name, model, load, observe);
-		return this;
-	}
-	
-	public <M> VueComponent<T> removeDataFiber(String name) {
-		getVueBehavior().removeDataFiber(name);
-		return this;
-	}
-	
-	public <M> VueComponent<T> removeDataFiber(String name, boolean load, boolean observe) {
-		getVueBehavior().removeDataFiber(name, load, observe);
-		return this;
-	}
 
+	@Override
+	public VueComponent<T> getThisComponent() {
+		return this;
+	}
 }
