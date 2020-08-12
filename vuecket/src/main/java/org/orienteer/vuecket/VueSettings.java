@@ -54,10 +54,12 @@ public class VueSettings {
 	
 	private INPMPackageProvider npmPackageProvider;
 	private ObjectMapper objectMapper;
+	private int defaultRefreshPeriod;
 	
 	protected VueSettings() {
 		npmPackageProvider = UNPKG_PROVIDER;
 		objectMapper = new ObjectMapper();
+		defaultRefreshPeriod = 15;
 	}
 	
 	public INPMPackageProvider getNpmPackageProvider() {
@@ -75,6 +77,15 @@ public class VueSettings {
 	
 	public VueSettings setObjectMapper(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
+		return this;
+	}
+	
+	public int getDefaultRefreshPeriod() {
+		return defaultRefreshPeriod;
+	}
+	
+	public VueSettings setDefaultRefreshPeriod(int defaultRefreshPeriod) {
+		this.defaultRefreshPeriod = defaultRefreshPeriod;
 		return this;
 	}
 

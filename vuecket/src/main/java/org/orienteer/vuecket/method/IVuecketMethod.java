@@ -72,6 +72,7 @@ public interface IVuecketMethod<R> extends IClusterable {
 	}
 	
 	public static void pushDataPatch(Context ctx, Map<String, ?> patch)  {
+		if(patch==null || patch.isEmpty()) return;
 		try {
 			String json = VueSettings.get().getObjectMapper().writeValueAsString(patch);
 			String script = String.format("Vue.getVueById('%s').vcApply(%s)", ctx.getComponent().getMarkupId(), json);

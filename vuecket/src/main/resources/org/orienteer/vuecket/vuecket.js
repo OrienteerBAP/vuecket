@@ -53,6 +53,11 @@ const Vuecket = {
 				'vcLoad' : function(names) {
 					if(!names) names = this.vcConfig.load;
 					this.vcInvoke("vcLoad", names);
+				},
+				'vcRefresh' : function(names) {
+					console.log("vcRefresh INVOKED");
+					if(!names) names = this.vcConfig.refresh;
+					this.vcInvoke("vcRefresh", names);
 				}
 		 	},
 		 	beforeMount : function() {
@@ -87,7 +92,13 @@ const Vuecket = {
 							this.vcInvoke("vcObserved", m, newValue);
 						}));
 				}
-			}
+				if(this.vcConfig.refresh) {
+					this.vcConfig.refreshTimer = setInterval(this.vcRefresh, this.vcConfig.rp*2000);
+				}
+			},
+		    beforeDestroy () {
+		      if(this.vcConfig.refreshTimer) clearInterval(this.vcConfig.refreshTimer);
+		    }
 		 });
 	}
 }

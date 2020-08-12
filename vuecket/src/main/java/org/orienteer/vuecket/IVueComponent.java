@@ -80,8 +80,8 @@ public interface IVueComponent<C> {
 		return getThisComponent();
 	}
 	
-	public default <M> C addDataFiber(String name, boolean load, boolean observe) {
-		getVueBehavior().addDataFiber(name, getDefaultModel(), load, observe);
+	public default <M> C addDataFiber(String name, boolean load, boolean observe, boolean refresh) {
+		getVueBehavior().addDataFiber(name, getDefaultModel(), load, observe, refresh);
 		return getThisComponent();
 	}
 	
@@ -90,8 +90,8 @@ public interface IVueComponent<C> {
 		return getThisComponent();
 	}
 	
-	public default <M> C addDataFiber(String name, IModel<M> model, boolean load, boolean observe) {
-		getVueBehavior().addDataFiber(name, model, load, observe);
+	public default <M> C addDataFiber(String name, IModel<M> model, boolean load, boolean observe, boolean refresh) {
+		getVueBehavior().addDataFiber(name, model, load, observe, refresh);
 		return getThisComponent();
 	}
 	
@@ -102,6 +102,15 @@ public interface IVueComponent<C> {
 	
 	public default <M> C removeDataFiber(String name, boolean load, boolean observe) {
 		getVueBehavior().removeDataFiber(name, load, observe);
+		return getThisComponent();
+	}
+	
+	public default int getRefreshPeriod() {
+		return getVueBehavior().getRefreshPeriod();
+	}
+	
+	public default C setRefreshPeriod(Integer refreshPeriod) {
+		getVueBehavior().setRefreshPeriod(refreshPeriod);
 		return getThisComponent();
 	}
 }

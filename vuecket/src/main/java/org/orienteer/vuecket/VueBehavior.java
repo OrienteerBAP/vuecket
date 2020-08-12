@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -53,6 +54,11 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	private class VueConfigView implements IClusterable {
 		public CharSequence getUrl() {
 			return getCallbackUrl();
+		}
+		
+		@JsonProperty("rp")
+		public int getRefreshPeriod() {
+			return VueBehavior.this.getRefreshPeriod();
 		}
 		
 		public Collection<String> getOn() {
@@ -74,6 +80,10 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		public Collection<String> getObserve() {
 			return observeDataFibers.keySet();
 		}
+		
+		public Collection<String> getRefresh() {
+			return refreshDataFibers.keySet();
+		}
 	}
 	
 	private IVueDescriptor vueDescriptor;
@@ -87,6 +97,11 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	
 	private final Map<String, IModel<?>> loadDataFibers = new HashMap<String, IModel<?>>();
 	private final Map<String, IModel<?>> observeDataFibers = new HashMap<String, IModel<?>>();
+	private final Map<String, IModel<?>> refreshDataFibers = new HashMap<String, IModel<?>>();
+	
+	private final Map<String, Integer> refreshChangeIndicators = new HashMap<String, Integer>();
+	
+	private Integer refreshPeriod;
 	
 	public VueBehavior() {
 		
@@ -106,6 +121,15 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	
 	public VueBehavior setVueDescriptor(IVueDescriptor vueDescriptor) {
 		this.vueDescriptor = vueDescriptor;
+		return this;
+	}
+	
+	public int getRefreshPeriod() {
+		return refreshPeriod!=null?refreshPeriod:VueSettings.get().getDefaultRefreshPeriod();
+	}
+	
+	public VueBehavior setRefreshPeriod(Integer refreshPeriod) {
+		this.refreshPeriod = refreshPeriod;
 		return this;
 	}
 	
@@ -232,13 +256,14 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	}
 	
 	public <M> VueBehavior addDataFiber(String name, IModel<M> model) {
-		return addDataFiber(name, model, true, true);
+		return addDataFiber(name, model, true, true, false);
 	}
 	
-	public <M> VueBehavior addDataFiber(String name, IModel<M> model, boolean load, boolean observe) {
+	public <M> VueBehavior addDataFiber(String name, IModel<M> model, boolean load, boolean observe, boolean refresh) {
 		if(model==null) throw new WicketRuntimeException("Model for datafiber '"+name+"' shouldn't be null");
 		if(load) loadDataFibers.put(name, model);
 		if(observe) observeDataFibers.put(name, model);
+		if(refresh) refreshDataFibers.put(name, model);
 		return this;
 	}
 	
@@ -265,7 +290,32 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		Map<String, Object> loadPatch = new HashMap<String, Object>();
 		for (String name : toBeLoaded) {
 			IModel<?> model = loadDataFibers.get(name);
-			if(model!=null) loadPatch.put(name, model.getObject());
+			if(model!=null) {
+				Object value = model.getObject();
+				loadPatch.put(name, model.getObject());
+				if(refreshDataFibers.containsKey(name)) {
+					refreshChangeIndicators.put(name, value!=null?value.hashCode():-1);
+				}
+			}
+		}
+		IVuecketMethod.pushDataPatch(ctx, loadPatch);
+	}
+	
+	@VueMethod
+	public void vcRefresh(IVuecketMethod.Context ctx, Collection<String> toBeRefreshed) {
+		if(toBeRefreshed==null || toBeRefreshed.isEmpty()) toBeRefreshed = refreshDataFibers.keySet();
+		Map<String, Object> loadPatch = new HashMap<String, Object>();
+		for (String name : toBeRefreshed) {
+			IModel<?> model = refreshDataFibers.get(name);
+			if(model!=null) {
+				Object newValue = model.getObject();
+				int newHash = newValue!=null?newValue.hashCode():-1;
+				Integer oldHash = refreshChangeIndicators.get(name);
+				if(oldHash==null || newHash!=oldHash) {
+					loadPatch.put(name, model.getObject());
+					refreshChangeIndicators.put(name, newHash);
+				}
+			}
 		}
 		IVuecketMethod.pushDataPatch(ctx, loadPatch);
 	}
@@ -291,6 +341,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		super.detach(component);
 		for(IModel<?> model : loadDataFibers.values()) model.detach();
 		for(IModel<?> model : observeDataFibers.values()) model.detach();
+		for(IModel<?> model : refreshDataFibers.values()) model.detach();
 	}
 	
 	private void scanForAnnotations(Object object) {

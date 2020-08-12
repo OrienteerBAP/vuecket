@@ -54,7 +54,7 @@ public class HomePage extends WebPage {
 		
 		VueComponent<Object> app6 = new VueComponent<Object>("app6", HELLO_MODEL)
 										.setVueDescriptor("{ data: { text : 'Hello Vue'}}")
-										.addDataFiber("text");
+										.addDataFiber("text", true, true, true);
 		app6.add(new VueMarkdown("markdown", ""));
 		add(app6);
 		
