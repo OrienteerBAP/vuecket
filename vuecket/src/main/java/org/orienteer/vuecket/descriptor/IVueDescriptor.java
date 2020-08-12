@@ -2,10 +2,11 @@ package org.orienteer.vuecket.descriptor;
 
 
 import org.apache.wicket.Component;
+import org.apache.wicket.util.io.IClusterable;
 import org.orienteer.vuecket.VueComponent;
 import org.orienteer.vuecket.VueComponentHeaderItem;
 
-public interface IVueDescriptor {
+public interface IVueDescriptor extends IClusterable {
 	
 	public String getName();
 	
