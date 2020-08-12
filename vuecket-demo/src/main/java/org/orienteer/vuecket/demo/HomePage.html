@@ -10,12 +10,13 @@
 		<div id="hd">
 			<div id="logo">
 				<img src="logo.png" width="50px" height="50px" alt="Wicket Logo" />
-				<h1>Apache Wicket</h1>
+				<h1>Vuecket = VueJS + Apache Wicket</h1>
 			</div>
 		</div>
 		<div id="bd">
 			<div wicket:id="app">
-				<vue-markdown wicket:id="markdown">This will be replaced</vue-markdown>
+				<textarea v-model="text" style="width:100%" rows="5"></textarea>
+				<vue-markdown wicket:id="markdown" :source="text">Will be replaced</vue-markdown>
 			</div>
 		</div>
 		<div id="ft">

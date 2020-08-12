@@ -11,8 +11,8 @@ public class HomePage extends WebPage {
 
 	public HomePage(final PageParameters parameters) {
 		super(parameters);
-		add(new VueComponent<String>("app")
-				.add(new VueMarkdown("markdown", "# Hello World from Vuecket")));
+		add(new ChatApp("app")
+				.add(new VueMarkdown("markdown")));
 
 	}
 }
