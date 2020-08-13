@@ -15,7 +15,16 @@
 		</div>
 		<div id="bd">
 			<div wicket:id="app">
-				<textarea v-model="text" style="width:100%" rows="5"></textarea>
+				<div v-for="(m, index) in messages">
+					<h5>{{ index }}: {{ m.date }}</h5>
+					<vue-markdown :source="m.message"></vue-markdown>
+				</div>
+				<textarea v-model="text" 
+						  style="width:100%" 
+						  rows="5" 
+						  @keyup.ctrl.enter="addMessage"
+						  placeholder="Enter message and Ctrl-Enter to add the message">
+				 </textarea>
 				<vue-markdown wicket:id="markdown" :source="text">Will be replaced</vue-markdown>
 			</div>
 		</div>
