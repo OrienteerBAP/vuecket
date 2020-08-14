@@ -16,7 +16,7 @@
 		<div id="bd">
 			<div wicket:id="app">
 				<div v-for="(m, index) in messages">
-					<h5>{{ index }}: {{ m.date }}</h5>
+					<h5>{{ index }}: {{ new Date(m.date) }}</h5>
 					<vue-markdown :source="m.message"></vue-markdown>
 				</div>
 				<textarea v-model="text" 

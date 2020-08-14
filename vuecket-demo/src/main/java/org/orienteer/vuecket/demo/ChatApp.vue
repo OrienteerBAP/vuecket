@@ -8,7 +8,7 @@ module.exports = {
     },
     methods: {
     	addMessage : function() {
-    		this.messages.push({
+    		this.vcInvoke("addMessage", {
     			message: this.text,
     			date: new Date()
     		});
