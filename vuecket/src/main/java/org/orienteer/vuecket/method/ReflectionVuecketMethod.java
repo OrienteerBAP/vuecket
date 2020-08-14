@@ -49,7 +49,7 @@ public class ReflectionVuecketMethod<R> implements IVuecketMethod<R> {
 		for(int indx = 0; indx < args.size() && indx+shift < vals.length; indx++) {
 			vals[indx+shift] = om.treeToValue(args.get(indx), parameterTypes[indx+shift]);
 		}
-		return (R) method.invoke(obj, vals);
+		return (R) getMethod().invoke(obj, vals);
 	}
 	
 	@Override
