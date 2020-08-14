@@ -22,7 +22,7 @@ Vuecket allows to be reactive on frontend and backend without coding of REST ser
 - [ ] Support of data channels between server side and client
    - [X] One Time - upon Vue component load
    - [X] Observe - push changes to server side IMobel if they are changed on client one
-   - [ ] Periodical refresh from server side
+   - [X] Periodical refresh from server side
    - [ ] WebSocket based refresh from server side
 - [X] Support of server based Vue methods
 
@@ -168,7 +168,7 @@ Data fiber is a way to synchronize data between server side and browser. There a
 
 * `load` - data will be provided only for initial Vue component loading
 * `observe` - data will be sent back to server upon any change
-* `refresh` - data periodically checked for changes and if there are any - they will be uploaded (NOT YET SUPPORTED)
+* `refresh` - data periodically checked for changes and if there are any - they will be uploaded
 * `wspush` - data pushed to client server through WebSocket if there are changes (NOT YET SUPPORTED)
 
 Example:
