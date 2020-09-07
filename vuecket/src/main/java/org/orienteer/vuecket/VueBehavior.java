@@ -21,7 +21,6 @@ import org.apache.wicket.request.IRequestParameters;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.util.io.IClusterable;
-import org.apache.wicket.util.string.StringValue;
 import org.apache.wicket.util.string.Strings;
 import org.orienteer.vuecket.descriptor.IVueDescriptor;
 import org.orienteer.vuecket.descriptor.VueJsonDescriptor;
@@ -39,19 +38,25 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+/**
+ *	Main Vuecket class which brings as Behavior all Vuecket functionality to component to which it binded to  
+ */
 public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	
+	private static final long serialVersionUID = 1L;
 	public static final JavaScriptResourceReference VUE_JS = new JavaScriptResourceReference(VueComponent.class, "external/vue/dist/vue.js");
 	public static final JavaScriptResourceReference HTTP_VUE_LOADER_JS = new JavaScriptResourceReference(VueComponent.class, "external/http-vue-loader/src/httpVueLoader.js");
 	public static final JavaScriptResourceReference VUECKET_JS = new JavaScriptResourceReference(VueComponent.class, "vuecket.js");
 	
 	private static final Logger LOG = LoggerFactory.getLogger(VueBehavior.class);
 	
+	@SuppressWarnings("unused")
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private class VueConfigView implements IClusterable {
+		private static final long serialVersionUID = 1L;
+
 		public CharSequence getUrl() {
 			return getCallbackUrl();
 		}

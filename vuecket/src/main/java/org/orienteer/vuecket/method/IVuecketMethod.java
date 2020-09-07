@@ -14,9 +14,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+/**
+ * Describes methods which will be exposed to browser for invocation either directly `vcInvoke`/`vcCall`
+ * or per events or upon data modification
+ * @param <R> type of the returned object
+ */
 @FunctionalInterface
 public interface IVuecketMethod<R> extends IClusterable {
 	
+	/**
+	 * Context for {@link IVuecketMethod} invocations. Contains multiple useful parameters.
+	 */
 	public static class Context {
 		private VueBehavior vueBehavior;
 		private Component component;

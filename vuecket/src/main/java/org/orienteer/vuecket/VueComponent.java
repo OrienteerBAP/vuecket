@@ -10,6 +10,10 @@ import org.orienteer.vuecket.descriptor.VueFileDescriptor;
 import org.orienteer.vuecket.descriptor.VueJsonDescriptor;
 import org.orienteer.vuecket.method.IVuecketMethod;
 
+/**
+ * Wicket Component with prewired VueBehavior. It's absolutely optional to use this class or not. 
+ * @param <T> the type of the component's model object
+ */
 public class VueComponent<T> extends GenericWebMarkupContainer<T> implements IVueComponent<VueComponent<T>> {
 	
 	private final VueBehavior vueBehavior;

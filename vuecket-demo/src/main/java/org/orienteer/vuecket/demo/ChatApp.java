@@ -16,6 +16,9 @@ import org.orienteer.vuecket.method.IVuecketMethod.Context;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+/**
+ * Main {@link VueComponent} for chat application
+ */
 @VueFile("ChatApp.vue")
 public class ChatApp extends VueComponent<Void> {
 	

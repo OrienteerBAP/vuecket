@@ -8,6 +8,9 @@ import org.apache.wicket.util.parse.metapattern.MetaPattern;
 import org.apache.wicket.util.parse.metapattern.OptionalMetaPattern;
 import org.apache.wicket.util.parse.metapattern.parsers.VariableAssignmentParser;
 
+/**
+ * Utility class for workaround of issue WICKET-6815
+ */
 public class FixWICKET6815 {
 	private FixWICKET6815() {
 		
@@ -23,16 +26,16 @@ public class FixWICKET6815 {
 		field.set(object, newValue);
 	}
 	
-	private static final String _FIXED_XML_ATTRIBUTE_NAME = "[A-Za-z_@:][A-Za-z0-9_.-]*";
-	private static final MetaPattern FIXED_XML_ATTRIBUTE_NAME = new MetaPattern(_FIXED_XML_ATTRIBUTE_NAME);
+	private static final String FIXED_XML_ATTRIBUTE_NAME = "[A-Za-z_@:][A-Za-z0-9_.-]*";
+	private static final MetaPattern FIXED_XML_ATTRIBUTE_NAME_PATTERN = new MetaPattern(FIXED_XML_ATTRIBUTE_NAME);
 	
 	private static void hackParser() throws Exception {
 		Field namespaceField = VariableAssignmentParser.class.getDeclaredField("namespace");
 		setFinalField(null, namespaceField, new OptionalMetaPattern(new MetaPattern[] {
-				FIXED_XML_ATTRIBUTE_NAME, MetaPattern.COLON, new OptionalMetaPattern(new MetaPattern[] {FIXED_XML_ATTRIBUTE_NAME, MetaPattern.COLON })}));
+				FIXED_XML_ATTRIBUTE_NAME_PATTERN, MetaPattern.COLON, new OptionalMetaPattern(new MetaPattern[] {FIXED_XML_ATTRIBUTE_NAME_PATTERN, MetaPattern.COLON })}));
 		
 		Field xmlField = MetaPattern.class.getDeclaredField("XML_ATTRIBUTE_NAME"); 
-		setFinalField(null, xmlField, FIXED_XML_ATTRIBUTE_NAME);
+		setFinalField(null, xmlField, FIXED_XML_ATTRIBUTE_NAME_PATTERN);
 	}
 	
 	public static void fix() {

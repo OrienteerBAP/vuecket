@@ -9,6 +9,9 @@ import org.orienteer.vuecket.descriptor.VueJsonDescriptor;
 import org.orienteer.vuecket.util.FixWICKET6815;
 import org.orienteer.vuecket.util.VuecketUtils;
 
+/**
+ * Wicket {@link IInitializer} to init required Vuecket application level functionality
+ */
 public class VuecketInitializer implements IInitializer{
 
 	@Override

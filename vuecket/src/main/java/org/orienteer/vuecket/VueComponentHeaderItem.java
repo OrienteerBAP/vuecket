@@ -9,6 +9,9 @@ import org.apache.wicket.markup.head.JavaScriptContentHeaderItem;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.request.Response;
 
+/**
+ * {@link HeaderItem} to simplify supply of required resources for Vue components
+ */
 public class VueComponentHeaderItem extends HeaderItem {
 	
 	private String componentName;

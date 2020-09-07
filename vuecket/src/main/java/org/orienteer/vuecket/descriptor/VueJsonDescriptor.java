@@ -1,5 +1,6 @@
 package org.orienteer.vuecket.descriptor;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.core.util.string.JavaScriptUtils;
 import org.apache.wicket.markup.head.JavaScriptContentHeaderItem;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
@@ -7,6 +8,9 @@ import org.orienteer.vuecket.VueComponent;
 import org.orienteer.vuecket.VueComponentHeaderItem;
 import org.orienteer.vuecket.util.VuecketUtils;
 
+/**
+ * {@link IVueDescriptor} for association of {@link Component} with JSON with Vue descriptor
+ */
 public class VueJsonDescriptor implements IVueDescriptor {
 	
 	public static final VueJsonDescriptor EMPTY_ROOT = new VueJsonDescriptor("{}");

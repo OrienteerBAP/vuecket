@@ -9,6 +9,10 @@ import org.orienteer.vuecket.descriptor.VueFileDescriptor;
 import org.orienteer.vuecket.descriptor.VueJsonDescriptor;
 import org.orienteer.vuecket.method.IVuecketMethod;
 
+/**
+ * Interface-helper to bring in bulk set of Vuecket related methods to Wicket components
+ * @param <C> - type of a Component class to be attached to. Used for method chaining
+ */
 public interface IVueComponent<C> {
 	
 	public VueBehavior getVueBehavior();

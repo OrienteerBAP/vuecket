@@ -12,6 +12,9 @@ import org.apache.wicket.util.string.Strings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Holder of Vuecket related settings 
+ */
 public class VueSettings {
 	
 	public static final INPMPackageProvider UNPKG_PROVIDER = new NPMCDNPackageProvider("https://unpkg.com/%s/%s");
@@ -20,6 +23,9 @@ public class VueSettings {
 	private static final MetaDataKey<VueSettings> VUE_SETTINGS = new MetaDataKey<VueSettings>() {
 	};
 	
+	/**
+	 * Interface for providers of NPM package resource {@link ResourceReference}
+	 */
 	public static interface INPMPackageProvider extends IClusterable {
 		public ResourceReference provide(String npmPackage, String filePath);
 		
@@ -28,6 +34,9 @@ public class VueSettings {
 		}
 	}
 	
+	/**
+	 * CDN based {@link INPMPackageProvider}
+	 */
 	public static class NPMCDNPackageProvider implements INPMPackageProvider {
 		
 		private String packageFormat;

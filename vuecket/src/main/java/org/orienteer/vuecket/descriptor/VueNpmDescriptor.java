@@ -1,5 +1,6 @@
 package org.orienteer.vuecket.descriptor;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
@@ -9,6 +10,9 @@ import org.orienteer.vuecket.VueComponentHeaderItem;
 import org.orienteer.vuecket.VueSettings;
 import org.orienteer.vuecket.util.VuecketUtils;
 
+/**
+ * {@link IVueDescriptor} for association of {@link Component} with some Vue.JS NPM package
+ */
 public class VueNpmDescriptor implements IVueDescriptor {
 	
 	private String packageName;

@@ -17,6 +17,9 @@ import org.apache.wicket.util.string.Strings;
 import org.orienteer.vuecket.VueBehavior;
 import org.orienteer.vuecket.VueComponent;
 
+/**
+ * Collection of Vuecket utility methods
+ */
 public final class VuecketUtils {
 	
 	private final static Random RANDOM = new Random();

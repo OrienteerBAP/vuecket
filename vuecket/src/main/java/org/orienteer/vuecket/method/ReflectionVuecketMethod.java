@@ -10,6 +10,10 @@ import org.orienteer.vuecket.VueSettings;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+/**
+ * {@link IVuecketMethod} which use annotation {@link VueMethod} and reflection for invocation
+ * @param <R> type of returned object
+ */
 public class ReflectionVuecketMethod<R> implements IVuecketMethod<R> {
 
 	private transient Method method;
