@@ -48,20 +48,23 @@ const Vuecket = {
 						}
 		 		},
 				'vcApply' : function(patch) {
-					Object.assign(this, patch);
+					if(this.vcConfig) Object.assign(this, patch);
 				},
 				'vcLoad' : function(names) {
-					if(!names) names = this.vcConfig.load;
-					this.vcInvoke("vcLoad", names);
+					if(this.vcConfig) {
+						if(!names) names = this.vcConfig.load;
+						this.vcInvoke("vcLoad", names);
+					}
 				},
 				'vcRefresh' : function(names) {
-					console.log("vcRefresh INVOKED");
-					if(!names) names = this.vcConfig.refresh;
-					this.vcInvoke("vcRefresh", names);
+					if(this.vcConfig) {
+						if(!names) names = this.vcConfig.refresh;
+						this.vcInvoke("vcRefresh", names);
+					}
 				}
 		 	},
 		 	beforeMount : function() {
-				if(this.$el) {
+				if(this.$el && this.$el.getAttribute) {
 					this.$vcId = this.$el.id;
 					this.$data.vcConfig = JSON.parse(this.$el.getAttribute('vc-config'));
 				}
@@ -70,30 +73,32 @@ const Vuecket = {
 				if(this.$vcId) this.$el.id = this.$vcId;
 				else {
 					this.$vcId = this.$el.id;
-					this.$data.vcConfig = JSON.parse(this.$el.getAttribute('vc-config'));
+					if(this.$el.getAttribute) this.$data.vcConfig = JSON.parse(this.$el.getAttribute('vc-config'));
 				}
-				var registerMethods = function (collection, vueFunction) {
-					if(collection) {
-						collection.forEach(m => vueFunction.call(this, m, function(){
-							var args = Array.prototype.slice.call(arguments);
-							args.unshift(m);
-							this.vcInvoke.apply(this, args);
-						}));
+				if(this.vcConfig) {
+					var registerMethods = function (collection, vueFunction) {
+						if(collection) {
+							collection.forEach(m => vueFunction.call(this, m, function(){
+								var args = Array.prototype.slice.call(arguments);
+								args.unshift(m);
+								this.vcInvoke.apply(this, args);
+							}));
+						}
+					};
+					registerMethods.call(this, this.vcConfig.on, this.$on);
+					registerMethods.call(this, this.vcConfig.once, this.$once);
+					registerMethods.call(this, this.vcConfig.watch, this.$watch);
+					if(this.vcConfig.load) {
+						this.vcLoad();
 					}
-				};
-				registerMethods.call(this, this.vcConfig.on, this.$on);
-				registerMethods.call(this, this.vcConfig.once, this.$once);
-				registerMethods.call(this, this.vcConfig.watch, this.$watch);
-				if(this.vcConfig.load) {
-					this.vcLoad();
-				}
-				if(this.vcConfig.observe) {
-					this.vcConfig.observe.forEach(m => this.$watch(m, function(newValue){
-							this.vcInvoke("vcObserved", m, newValue);
-						}));
-				}
-				if(this.vcConfig.refresh) {
-					this.vcConfig.refreshTimer = setInterval(this.vcRefresh, this.vcConfig.rp*2000);
+					if(this.vcConfig.observe) {
+						this.vcConfig.observe.forEach(m => this.$watch(m, function(newValue){
+								this.vcInvoke("vcObserved", m, newValue);
+							}));
+					}
+					if(this.vcConfig.refresh) {
+						this.vcConfig.refreshTimer = setInterval(this.vcRefresh, this.vcConfig.rp*2000);
+					}
 				}
 			},
 		    beforeDestroy () {
