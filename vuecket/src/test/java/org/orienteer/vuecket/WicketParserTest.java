@@ -31,7 +31,7 @@ public class WicketParserTest {
 	
 	@Test
 	public void testTagAttributeParsing() throws Exception {
-		String tag = "label wicket:id=\"myid\" bind:test=\"test\" v-bind:test2=\"test2\" @test3=\"test3\" :test4=\"test4\"";
+		String tag = "label wicket:id=\"myid\" bind:test=\"test\" v-bind:test2=\"test2\" @test3=\"test3\" :test4=\"test4\" #test5=\"test5\"";
 		VariableAssignmentParser attributeParser = new VariableAssignmentParser(tag);
 		int pos = 5;
 		assertTrue(attributeParser.matcher().find(pos));
@@ -68,5 +68,12 @@ public class WicketParserTest {
 		pos = attributeParser.matcher().end(0);
 		assertEquals(":test4", key);
 		assertEquals("\"test4\"", value);
+		
+		assertTrue(attributeParser.matcher().find(pos));
+		key = attributeParser.getKey();
+		value = attributeParser.getValue();
+		pos = attributeParser.matcher().end(0);
+		assertEquals("#test5", key);
+		assertEquals("\"test5\"", value);
 	}
 }

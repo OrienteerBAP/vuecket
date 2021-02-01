@@ -26,7 +26,7 @@ public class FixWICKET6815 {
 		field.set(object, newValue);
 	}
 	
-	private static final String FIXED_XML_ATTRIBUTE_NAME = "[A-Za-z_@:][A-Za-z0-9_.-]*";
+	private static final String FIXED_XML_ATTRIBUTE_NAME = "[A-Za-z_@:#][A-Za-z0-9_.-]*";
 	private static final MetaPattern FIXED_XML_ATTRIBUTE_NAME_PATTERN = new MetaPattern(FIXED_XML_ATTRIBUTE_NAME);
 	
 	private static void hackParser() throws Exception {
