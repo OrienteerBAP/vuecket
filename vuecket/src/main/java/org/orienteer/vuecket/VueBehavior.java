@@ -182,7 +182,10 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 			ArrayNode argsNode = (ArrayNode) VueSettings.get().getObjectMapper().readTree(arguments);
 			IVuecketMethod<?> m = lookupMethod(method);
 			if(m==null) {
-				LOG.warn("Vue method for '%s' was not found", method);
+				LOG.warn("Vue method for '{}' was not found on component of {} on path {} ", 
+									method, 
+									getComponent().getClass(), 
+									getComponent().getPath());
 				return;
 			}
 			if(async) m.invoke(ctx, argsNode);

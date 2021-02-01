@@ -9,6 +9,7 @@ import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.request.resource.UrlResourceReference;
 import org.apache.wicket.util.io.IClusterable;
 import org.apache.wicket.util.string.Strings;
+import org.orienteer.vuecket.util.VuecketUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -56,6 +57,7 @@ public class VueSettings {
 			String url=null;
 			if(Strings.isEmpty(file) && packageFormat!=null) url = String.format(packageFormat, npmPackage);
 			else url = String.format(packageWithFileFormat, npmPackage, Strings.defaultIfEmpty(file, ""));
+			if(packageFormat==null && Strings.isEmpty(file)) url = VuecketUtils.removeSuffix(url, "/");
 			return new UrlResourceReference(Url.parse(url));
 		}
 		
