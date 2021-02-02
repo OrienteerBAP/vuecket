@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
@@ -43,7 +45,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 /**
  *	Main Vuecket class which brings as Behavior all Vuecket functionality to component to which it binded to  
  */
-public class VueBehavior extends AbstractDefaultAjaxBehavior {
+public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBehaviorLocator {
 	
 	private static final long serialVersionUID = 1L;
 	public static final JavaScriptResourceReference VUE_JS = new JavaScriptResourceReference(VueComponent.class, "external/vue/dist/vue.js");
@@ -100,6 +102,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	private final Map<String, IVuecketMethod<?>> vueOnceMethods = new HashMap<String, IVuecketMethod<?>>();
 	private final Map<String, IVuecketMethod<?>> vueWatchMethods = new HashMap<String, IVuecketMethod<?>>();
 	
+	private final Map<String, IModel<?>> propertyDataFibers = new HashMap<String, IModel<?>>();
 	private final Map<String, IModel<?>> loadDataFibers = new HashMap<String, IModel<?>>();
 	private final Map<String, IModel<?>> observeDataFibers = new HashMap<String, IModel<?>>();
 	private final Map<String, IModel<?>> refreshDataFibers = new HashMap<String, IModel<?>>();
@@ -177,9 +180,9 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		String arguments = params.getParameterValue("args").toString();
 		IVuecketMethod.Context ctx = IVuecketMethod.contextFor(this, getComponent(), target, mailBoxId);
 		
-		
 		try {
 			ArrayNode argsNode = (ArrayNode) VueSettings.get().getObjectMapper().readTree(arguments);
+			ctx.setRawArgs(argsNode);
 			IVuecketMethod<?> m = lookupMethod(method);
 			if(m==null) {
 				LOG.warn("Vue method for '{}' was not found on component of {} on path {} ", 
@@ -216,14 +219,35 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		if(vueComponentHeaderItem!=null) response.render(vueComponentHeaderItem);
 	}
 	
+	public String getComponentMarkupId() {
+		return getComponent().getMarkupId();
+	}
+	
 	@Override
 	protected void onComponentTag(ComponentTag tag) {
 		super.onComponentTag(tag);
-		try {
-			String config = VueSettings.get().getObjectMapper().writeValueAsString(configView);
-			tag.put("vc-config", config );
-		} catch (JsonProcessingException e) {
-			throw new WicketRuntimeException(e);
+		if(tag.isOpen() || tag.isOpenClose()) {
+			try {
+				String config = VueSettings.get().getObjectMapper().writeValueAsString(configView);
+				tag.put("vc-config", config );
+				if(!propertyDataFibers.isEmpty()) {
+					Set<String> normilizedAttrs = tag.getAttributes().keySet();
+					if(!normilizedAttrs.isEmpty())
+							normilizedAttrs = normilizedAttrs.stream()
+													.map(s -> VuecketUtils.getSuffixAfter(s, ":"))
+													.collect(Collectors.toSet());
+					for (Map.Entry<String, IModel<?>> entry : propertyDataFibers.entrySet()) {
+						if(!normilizedAttrs.contains(entry.getKey())) {
+							Object object = entry.getValue().getObject();
+							if(object!=null)
+								tag.put(":"+entry.getKey(), 
+										VueSettings.get().getObjectMapper().writeValueAsString(object));
+						}
+					}
+				}
+			} catch (JsonProcessingException e) {
+				throw new WicketRuntimeException(e);
+			}
 		}
 	}
 	
@@ -263,25 +287,15 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 		return this;
 	}
 	
-	public <M> VueBehavior addDataFiber(String name, IModel<M> model) {
-		return addDataFiber(name, model, true, true, false);
+	public <M> DataFiberBuilder<M, VueBehavior> dataFiberBuilder(IModel<M> model, String name) {
+		return new DataFiberBuilder<M, VueBehavior>(this, model, name);
 	}
 	
-	public <M> VueBehavior addDataFiber(String name, IModel<M> model, boolean load, boolean observe, boolean refresh) {
-		if(model==null) throw new WicketRuntimeException("Model for datafiber '"+name+"' shouldn't be null");
+	public <M> VueBehavior addDataFiber(String name, IModel<M> model, boolean property, boolean load, boolean observe, boolean refresh) {
+		if(property) propertyDataFibers.put(name, model);
 		if(load) loadDataFibers.put(name, model);
 		if(observe) observeDataFibers.put(name, model);
 		if(refresh) refreshDataFibers.put(name, model);
-		return this;
-	}
-	
-	public <M> VueBehavior removeDataFiber(String name) {
-		return removeDataFiber(name, true, true);
-	}
-	
-	public <M> VueBehavior removeDataFiber(String name, boolean load, boolean observe) {
-		if(load) loadDataFibers.remove(name);
-		if(observe) observeDataFibers.remove(name);
 		return this;
 	}
 	
@@ -347,6 +361,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 	@Override
 	public void detach(Component component) {
 		super.detach(component);
+		for(IModel<?> model : propertyDataFibers.values()) model.detach();
 		for(IModel<?> model : loadDataFibers.values()) model.detach();
 		for(IModel<?> model : observeDataFibers.values()) model.detach();
 		for(IModel<?> model : refreshDataFibers.values()) model.detach();
@@ -366,6 +381,11 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior {
 			String name = Strings.defaultIfEmpty(VuecketUtils.getAnnotationValue(annotation), method.getName());
 			map.put(name, new ReflectionVuecketMethod<Object>(method));
 		}
+	}
+
+	@Override
+	public VueBehavior getVueBehavior() {
+		return this;
 	}
 
 }

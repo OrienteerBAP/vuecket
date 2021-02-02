@@ -11,8 +11,11 @@ import org.orienteer.vuecket.VueSettings;
 import org.orienteer.vuecket.util.VuecketUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+
+import lombok.Setter;
+import lombok.Value;
+import lombok.experimental.NonFinal;
 
 /**
  * Describes methods which will be exposed to browser for invocation either directly `vcInvoke`/`vcCall`
@@ -25,11 +28,13 @@ public interface IVuecketMethod<R> extends IClusterable {
 	/**
 	 * Context for {@link IVuecketMethod} invocations. Contains multiple useful parameters.
 	 */
+	@Value
 	public static class Context {
 		private VueBehavior vueBehavior;
 		private Component component;
 		private AjaxRequestTarget target;
 		private String mailBoxId;
+		private @NonFinal @Setter ArrayNode rawArgs;
 		
 		private Context(VueBehavior vueBehavior, Component component, AjaxRequestTarget target, String mailBoxId) {
 			super();
@@ -38,23 +43,6 @@ public interface IVuecketMethod<R> extends IClusterable {
 			this.target = target;
 			this.mailBoxId = mailBoxId;
 		}
-
-		public VueBehavior getVueBehavior() {
-			return vueBehavior;
-		}
-		
-		public Component getComponent() {
-			return component;
-		}
-		
-		public AjaxRequestTarget getTarget() {
-			return target;
-		}
-		
-		public String getMailBoxId() {
-			return mailBoxId;
-		}
-		
 	}
 	
 	public R invoke(Context ctx, ArrayNode args) throws Exception;

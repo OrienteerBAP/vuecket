@@ -118,4 +118,12 @@ public final class VuecketUtils {
 		if(str==null || suffix==null ||  !str.endsWith(suffix)) return str;
 		else return str.substring(0, str.length() - suffix.length());
 	}
+	
+	public static String getSuffixAfter(String str, String delimeter) {
+		if(str==null || delimeter==null) return str;
+		else {
+			int indx = str.lastIndexOf(delimeter);
+			return indx<0?str:str.substring(indx+1);
+		}
+	}
 }

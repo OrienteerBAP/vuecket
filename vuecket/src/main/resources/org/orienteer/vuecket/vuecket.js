@@ -7,18 +7,18 @@ const Vuecket = {
 						};
 			},
 			methods : {
-				'vcInvoke' : function (method) {
+				'vcInvoke' : function (method, ...args) {
 						if(this.vcConfig) Wicket.Ajax.ajax({"u":this.vcConfig.url,
 					    				  "m":"POST",
 					    				  "c":this.$el.id,
 					    				  "ep": {   
 													a : true,
 													m : method,		
-													args : JSON.stringify(Array.prototype.slice.call(arguments, 1))
+													args : JSON.stringify(args)
 												}
 					    				  });
 		 		},
-				'vcCall' : function (method) {
+				'vcCall' : function (method, ...args) {
 						if(this.vcConfig) {
 							return new Promise((resolve, reject) => {
 								var ms = this.$vcMailbox;
@@ -41,7 +41,7 @@ const Vuecket = {
 														a : false,
 														m : method,
 														mb : mailboxId,	
-														args : JSON.stringify(Array.prototype.slice.call(arguments, 1))
+														args : JSON.stringify(args)
 													}
 						    				  });
 							});
@@ -78,10 +78,8 @@ const Vuecket = {
 				if(this.vcConfig) {
 					var registerMethods = function (collection, vueFunction) {
 						if(collection) {
-							collection.forEach(m => vueFunction.call(this, m, function(){
-								var args = Array.prototype.slice.call(arguments);
-								args.unshift(m);
-								this.vcInvoke.apply(this, args);
+							collection.forEach(m => vueFunction.call(this, m, function(...args){
+								this.vcInvoke(m, ...args);
 							}));
 						}
 					};

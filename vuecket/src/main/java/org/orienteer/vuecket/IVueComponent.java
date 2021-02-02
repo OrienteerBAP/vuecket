@@ -13,8 +13,9 @@ import org.orienteer.vuecket.method.IVuecketMethod;
  * Interface-helper to bring in bulk set of Vuecket related methods to Wicket components
  * @param <C> - type of a Component class to be attached to. Used for method chaining
  */
-public interface IVueComponent<C> {
+public interface IVueComponent<C extends IVueBehaviorLocator> extends IVueBehaviorLocator {
 	
+	@Override
 	public VueBehavior getVueBehavior();
 	
 	public IModel<?> getDefaultModel();
@@ -79,33 +80,16 @@ public interface IVueComponent<C> {
 		return getThisComponent();
 	}
 	
-	public default <M> C addDataFiber(String name) {
-		getVueBehavior().addDataFiber(name, getDefaultModel());
-		return getThisComponent();
+	public default <M> DataFiberBuilder<M, C> dataFiberBuilder(String name) {
+		return dataFiberBuilder((IModel<M>)getDefaultModel(), name);
 	}
 	
-	public default <M> C addDataFiber(String name, boolean load, boolean observe, boolean refresh) {
-		getVueBehavior().addDataFiber(name, getDefaultModel(), load, observe, refresh);
-		return getThisComponent();
+	public default <M> DataFiberBuilder<M, C> dataFiberBuilder(IModel<M> model, String name) {
+		return new DataFiberBuilder<M, C>(getThisComponent(), model, name);
 	}
 	
-	public default <M> C addDataFiber(String name, IModel<M> model) {
-		getVueBehavior().addDataFiber(name, model);
-		return getThisComponent();
-	}
-	
-	public default <M> C addDataFiber(String name, IModel<M> model, boolean load, boolean observe, boolean refresh) {
-		getVueBehavior().addDataFiber(name, model, load, observe, refresh);
-		return getThisComponent();
-	}
-	
-	public default <M> C removeDataFiber(String name) {
-		getVueBehavior().removeDataFiber(name);
-		return getThisComponent();
-	}
-	
-	public default <M> C removeDataFiber(String name, boolean load, boolean observe) {
-		getVueBehavior().removeDataFiber(name, load, observe);
+	public default <M> C addDataFiber(String name, IModel<M> model, boolean prop, boolean load, boolean observe, boolean refresh) {
+		getVueBehavior().addDataFiber(name, model, prop, load, observe, refresh);
 		return getThisComponent();
 	}
 	

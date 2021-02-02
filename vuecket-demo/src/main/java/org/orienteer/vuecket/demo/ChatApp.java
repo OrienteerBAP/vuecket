@@ -28,7 +28,7 @@ public class ChatApp extends VueComponent<Void> {
 
 	public ChatApp(String id) {
 		super(id);
-		addDataFiber("messages", MESSAGES, true, false, false);
+		dataFiberBuilder(MESSAGES, "messages").load().build();
 	}
 	
 	@VueMethod

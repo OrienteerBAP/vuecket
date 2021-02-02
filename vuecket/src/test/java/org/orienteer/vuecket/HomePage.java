@@ -22,8 +22,9 @@ public class HomePage extends WebPage {
 
 	public HomePage(final PageParameters parameters) {
 		super(parameters);
-		add(new VueComponent<String>("app")
+		add(new VueComponent<String>("app", Model.of("my attr"))
 				.setVueDescriptor("{ data: { message : 'Hello Vue'}}")
+				.dataFiberBuilder("customattr").property().build()
 		);
 		
 		add(new VueComponent<String>("app2")
@@ -54,7 +55,11 @@ public class HomePage extends WebPage {
 		
 		VueComponent<Object> app6 = new VueComponent<Object>("app6", HELLO_MODEL)
 										.setVueDescriptor("{ data: { text : 'Hello Vue'}}")
-										.addDataFiber("text", true, true, true);
+										.dataFiberBuilder("text")
+											.load()
+											.observe()
+											.refresh()
+										.build();
 		app6.add(new VueMarkdown("markdown", ""));
 		add(app6);
 		
