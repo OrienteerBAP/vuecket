@@ -4,6 +4,7 @@ import org.apache.wicket.Component;
 import org.apache.wicket.core.util.string.JavaScriptUtils;
 import org.apache.wicket.markup.head.JavaScriptContentHeaderItem;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
+import org.apache.wicket.util.string.Strings;
 import org.orienteer.vuecket.VueComponent;
 import org.orienteer.vuecket.VueComponentHeaderItem;
 import org.orienteer.vuecket.util.VuecketUtils;
@@ -23,11 +24,11 @@ public class VueJsonDescriptor implements IVueDescriptor {
 	}
 	
 	public VueJsonDescriptor(String json) {
-		this(VuecketUtils.randomId(), json);
+		this(null, json);
 	}
 	
 	public VueJsonDescriptor(String name, String json) {
-		this.name = name;
+		this.name = Strings.isEmpty(name)?VuecketUtils.randomId():name;
 		this.json = json;
 	}
 	

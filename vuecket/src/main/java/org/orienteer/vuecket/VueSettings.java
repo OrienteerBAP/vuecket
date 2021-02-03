@@ -11,6 +11,7 @@ import org.apache.wicket.util.io.IClusterable;
 import org.apache.wicket.util.string.Strings;
 import org.orienteer.vuecket.util.VuecketUtils;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -70,6 +71,8 @@ public class VueSettings {
 	protected VueSettings() {
 		npmPackageProvider = UNPKG_PROVIDER;
 		objectMapper = new ObjectMapper();
+		objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+		objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
 		defaultRefreshPeriod = 15;
 	}
 	

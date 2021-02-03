@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface VueJson {
-	public String name();
-	public String json();
+	public String name() default "";
+	public String json() default "{}";
 }

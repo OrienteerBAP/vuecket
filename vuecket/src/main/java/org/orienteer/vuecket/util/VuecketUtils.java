@@ -16,6 +16,11 @@ import org.apache.wicket.model.IObjectClassAwareModel;
 import org.apache.wicket.util.string.Strings;
 import org.orienteer.vuecket.VueBehavior;
 import org.orienteer.vuecket.VueComponent;
+import org.orienteer.vuecket.VueSettings;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Collection of Vuecket utility methods
@@ -124,6 +129,14 @@ public final class VuecketUtils {
 		else {
 			int indx = str.lastIndexOf(delimeter);
 			return indx<0?str:str.substring(indx+1);
+		}
+	}
+	
+	public static JsonNode toJsonNode(String json) {
+		try {
+			return VueSettings.get().getObjectMapper().readTree(json);
+		} catch (JsonProcessingException e) {
+			throw new WicketRuntimeException("Wrong json format: "+json, e);
 		}
 	}
 }
