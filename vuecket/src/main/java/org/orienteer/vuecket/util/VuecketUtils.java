@@ -21,6 +21,9 @@ import org.orienteer.vuecket.VueSettings;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 /**
  * Collection of Vuecket utility methods
@@ -134,7 +137,11 @@ public final class VuecketUtils {
 	
 	public static JsonNode toJsonNode(String json) {
 		try {
-			return VueSettings.get().getObjectMapper().readTree(json);
+			ObjectMapper om = VueSettings.get().getObjectMapper();
+			if(Strings.isEmpty(json)) return NullNode.getInstance();
+			char firstChar = json.trim().charAt(0);
+			if(firstChar!='{' && firstChar!='[' && firstChar!='"') return TextNode.valueOf(json);
+			else return om.readTree(json);
 		} catch (JsonProcessingException e) {
 			throw new WicketRuntimeException("Wrong json format: "+json, e);
 		}
