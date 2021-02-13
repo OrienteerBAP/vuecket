@@ -1,14 +1,15 @@
 <template>
   <p class="custom-component">
-    {{ text }}
+    {{ text }} {{ content }}
   </p>
 </template>
 
 <script>
 module.exports = {
+    props: ['content'],
     data: function() {
         return {
-            text: 'Default Text'
+            text: 'Internal Text'
         }
     }
 }

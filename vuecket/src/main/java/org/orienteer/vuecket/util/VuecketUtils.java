@@ -25,6 +25,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.base.CaseFormat;
+import com.google.common.base.Converter;
 
 /**
  * Collection of Vuecket utility methods
@@ -32,6 +34,9 @@ import com.fasterxml.jackson.databind.node.TextNode;
 public final class VuecketUtils {
 	
 	private final static Random RANDOM = new Random();
+	private final static Converter<String, String> CONVERTER_TO_KEBAB 
+								= CaseFormat.UPPER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE);
+	
 	private VuecketUtils() {
 		
 	}
@@ -146,5 +151,9 @@ public final class VuecketUtils {
 		} catch (JsonProcessingException e) {
 			throw new WicketRuntimeException("Wrong json format: "+json, e);
 		}
+	}
+	
+	public static String toKebab(String string) {
+		return string!=null?CONVERTER_TO_KEBAB.convert(string):null;
 	}
 }

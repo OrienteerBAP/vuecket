@@ -2,13 +2,10 @@ package org.orienteer.vuecket.descriptor;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.core.util.string.JavaScriptUtils;
-import org.apache.wicket.markup.head.JavaScriptContentHeaderItem;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.string.Strings;
-import org.orienteer.vuecket.VueComponent;
 import org.orienteer.vuecket.VueComponentHeaderItem;
 import org.orienteer.vuecket.util.VuecketUtils;
 
@@ -16,6 +13,7 @@ import org.orienteer.vuecket.util.VuecketUtils;
  * {@link IVueDescriptor} for association of {@link Component} with some *.vue file
  */
 public class VueFileDescriptor implements IVueDescriptor {
+	
 	
 	private String name;
 	private ResourceReference reference;
@@ -34,7 +32,7 @@ public class VueFileDescriptor implements IVueDescriptor {
 	}
 	
 	private static String extractName(VueFile vueFile) {
-		return !Strings.isEmpty(vueFile.name())?vueFile.name():VuecketUtils.removeSuffix(vueFile.value(), ".vue");
+		return VuecketUtils.toKebab(!Strings.isEmpty(vueFile.name())?vueFile.name():VuecketUtils.removeSuffix(vueFile.value(), ".vue"));
 	}
 	
 	@Override

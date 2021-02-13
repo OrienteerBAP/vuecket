@@ -1,8 +1,11 @@
 package org.orienteer.vuecket;
 
 
+import static org.orienteer.vuecket.util.VuecketUtils.*;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +35,6 @@ import org.orienteer.vuecket.method.VueMethod;
 import org.orienteer.vuecket.method.VueOn;
 import org.orienteer.vuecket.method.VueOnce;
 import org.orienteer.vuecket.method.VueWatch;
-import org.orienteer.vuecket.util.VuecketUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,7 +163,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 			{
 				return VueComponent.class.cast(current).getVueBehavior();
 			} else {
-				VueBehavior ret = VuecketUtils.findVueBehavior(current);
+				VueBehavior ret = findVueBehavior(current);
 				if(ret!=null) return ret;
 			}
 
@@ -234,7 +236,8 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 					Set<String> normilizedAttrs = tag.getAttributes().keySet();
 					if(!normilizedAttrs.isEmpty())
 							normilizedAttrs = normilizedAttrs.stream()
-													.map(s -> VuecketUtils.getSuffixAfter(s, ":"))
+													.map(s -> getSuffixAfter(s, ":"))
+													.flatMap(s -> Arrays.asList(s, toKebab(s)).stream())
 													.collect(Collectors.toSet());
 					for (Map.Entry<String, IModel<?>> entry : propertyDataFibers.entrySet()) {
 						if(!normilizedAttrs.contains(entry.getKey())) {
@@ -349,7 +352,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 			LOG.warn("Observing model '%s' was not found", name);
 			return;
 		}
-		Class<?> requiredClass = VuecketUtils.getValueClass(model);
+		Class<?> requiredClass = getValueClass(model);
 		if(requiredClass==null) {
 			LOG.warn("Required class for observing model '%s' was not detected. Recommed to define it explicitly.", name);
 			return;
@@ -375,10 +378,10 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 	}
 	
 	private void scanForAnnotation(Object object, Class<? extends Annotation> annotationClazz, Map<String, IVuecketMethod<?>> map) {
-		List<Method> methods = VuecketUtils.getMethodsAnnotatedWith(object.getClass(), annotationClazz);
+		List<Method> methods = getMethodsAnnotatedWith(object.getClass(), annotationClazz);
 		for (Method method : methods) {
 			Annotation annotation = method.getAnnotation(annotationClazz);
-			String name = Strings.defaultIfEmpty(VuecketUtils.getAnnotationValue(annotation), method.getName());
+			String name = Strings.defaultIfEmpty(getAnnotationValue(annotation), method.getName());
 			map.put(name, new ReflectionVuecketMethod<Object>(method));
 		}
 	}

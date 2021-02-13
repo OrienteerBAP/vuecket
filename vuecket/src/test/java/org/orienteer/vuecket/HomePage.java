@@ -64,7 +64,7 @@ public class HomePage extends WebPage {
 		add(app6);
 		
 		VueComponent<Void> app7 = new VueComponent<Void>("app7");
-		app7.add(new VueCustomComponent("custom", Model.of("TEST")));
+		app7.add(new VueCustomComponent("custom", Model.of("Text as component model")));
 		add(app7);
 		
 		Form<?> form = new Form<Object>("form");
