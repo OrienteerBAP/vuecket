@@ -14,6 +14,7 @@ import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.IObjectClassAwareModel;
 import org.apache.wicket.util.string.Strings;
+import org.orienteer.vuecket.IVueBehaviorLocator;
 import org.orienteer.vuecket.VueBehavior;
 import org.orienteer.vuecket.VueComponent;
 import org.orienteer.vuecket.VueSettings;
@@ -54,7 +55,7 @@ public final class VuecketUtils {
 	}
 	
 	public static VueBehavior findVueBehavior(Component comp) {
-		if(comp instanceof VueComponent) return ((VueComponent<?>)comp).getVueBehavior();
+		if(comp instanceof IVueBehaviorLocator) return ((IVueBehaviorLocator)comp).getVueBehavior();
 		else {
 			List<VueBehavior> vueBehaviors = comp.getBehaviors(VueBehavior.class);
 			return vueBehaviors==null || vueBehaviors.isEmpty()? null:vueBehaviors.get(0);

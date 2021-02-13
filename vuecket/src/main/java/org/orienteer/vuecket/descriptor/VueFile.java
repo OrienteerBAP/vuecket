@@ -13,4 +13,5 @@ import java.lang.annotation.Target;
 @Target(TYPE)
 public @interface VueFile {
 	String value();
+	String name() default "";
 }

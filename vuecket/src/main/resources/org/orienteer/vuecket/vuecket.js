@@ -112,6 +112,17 @@ Vue.getVueById = function(id) {
 	return document.getElementById(id).__vue__;
 };
 
+Vue.loadRootVue = function(resourceURL, elm) {
+	httpVueLoader.load(resourceURL)().then(function(d){new Vue(d).$mount(elm);})
+};
+
+Vue.loadComponentVue = function(resourceURL, name) {
+	var promise = httpVueLoader.load(resourceURL)();
+	Vue.component(name, function(resolve, reject){
+					promise.then(resolve).catch(reject)
+				  });
+};
+
 Vue.prototype.$vcMailbox = {
 	genBoxId : function() {
 		return Math.random().toString(36).substring(2, 15);

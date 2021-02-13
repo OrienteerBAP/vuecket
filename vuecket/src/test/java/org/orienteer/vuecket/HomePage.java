@@ -63,6 +63,10 @@ public class HomePage extends WebPage {
 		app6.add(new VueMarkdown("markdown", ""));
 		add(app6);
 		
+		VueComponent<Void> app7 = new VueComponent<Void>("app7");
+		app7.add(new VueCustomComponent("custom", Model.of("TEST")));
+		add(app7);
+		
 		Form<?> form = new Form<Object>("form");
 		form.add(new AjaxButton("button") {
 			@Override
