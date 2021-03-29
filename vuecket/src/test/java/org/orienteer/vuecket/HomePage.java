@@ -24,7 +24,7 @@ public class HomePage extends WebPage {
 		super(parameters);
 		add(new VueComponent<String>("app", Model.of("my attr"))
 				.setVueDescriptor("{ data: { message : 'Hello Vue'}}")
-				.dataFiberBuilder("customattr").property().build()
+				.dataFiberBuilder("customattr").bindToProperty().build()
 		);
 		
 		add(new VueComponent<String>("app2")
@@ -56,14 +56,14 @@ public class HomePage extends WebPage {
 		VueComponent<Object> app6 = new VueComponent<Object>("app6", HELLO_MODEL)
 										.setVueDescriptor("{ data: { text : 'Hello Vue'}}")
 										.dataFiberBuilder("text")
-											.load()
+											.init()
 											.observe()
-											.refresh()
+											.update()
 										.build();
 		app6.add(new VueMarkdown("markdown", ""));
 		add(app6);
 		
-		VueComponent<Void> app7 = new VueComponent<Void>("app7");
+		VueComponent<Void> app7 = new VueComponent<Void>("app7").setVueDescriptor("{ data : function () { return {'content': 'Initial content'}}, methods : { proxy : function(c){ console.log(c, typeof c); return new Proxy({'content': c}, {get(t, p, r){console.log(t,p,r); return 'Interception: '+t.content;}}) }}}");
 		app7.add(new VueCustomComponent("custom", Model.of("Text as component model")));
 		add(app7);
 		

@@ -27,6 +27,7 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.util.io.IClusterable;
 import org.apache.wicket.util.string.Strings;
+import org.orienteer.vuecket.DataFiber.DataFiberType;
 import org.orienteer.vuecket.descriptor.IVueDescriptor;
 import org.orienteer.vuecket.descriptor.VueJsonDescriptor;
 import org.orienteer.vuecket.method.IVuecketMethod;
@@ -82,16 +83,16 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 			return vueWatchMethods.keySet();
 		}
 		
-		public Collection<String> getLoad() {
-			return loadDataFibers.keySet();
+		public Collection<String> getInit() {
+			return dataFibers.getInitDataFibers().keySet();
 		}
 		
 		public Collection<String> getObserve() {
-			return observeDataFibers.keySet();
+			return dataFibers.getObserveDataFibers().keySet();
 		}
 		
 		public Collection<String> getRefresh() {
-			return refreshDataFibers.keySet();
+			return dataFibers.getUpdateDataFibers().keySet();
 		}
 	}
 	
@@ -104,12 +105,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 	private final Map<String, IVuecketMethod<?>> vueOnceMethods = new HashMap<String, IVuecketMethod<?>>();
 	private final Map<String, IVuecketMethod<?>> vueWatchMethods = new HashMap<String, IVuecketMethod<?>>();
 	
-	private final Map<String, IModel<?>> propertyDataFibers = new HashMap<String, IModel<?>>();
-	private final Map<String, IModel<?>> loadDataFibers = new HashMap<String, IModel<?>>();
-	private final Map<String, IModel<?>> observeDataFibers = new HashMap<String, IModel<?>>();
-	private final Map<String, IModel<?>> refreshDataFibers = new HashMap<String, IModel<?>>();
-	
-	private final Map<String, Integer> refreshChangeIndicators = new HashMap<String, Integer>();
+	private final DataFibersGroup dataFibers = new DataFibersGroup();
 	
 	private Integer refreshPeriod;
 	
@@ -232,6 +228,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 			try {
 				String config = VueSettings.get().getObjectMapper().writeValueAsString(configView);
 				tag.put("vc-config", config );
+				Map<String, DataFiber<?>> propertyDataFibers = dataFibers.getPropertyDataFibers();
 				if(!propertyDataFibers.isEmpty()) {
 					Set<String> normilizedAttrs = tag.getAttributes().keySet();
 					if(!normilizedAttrs.isEmpty())
@@ -239,9 +236,9 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 													.map(s -> getSuffixAfter(s, ":"))
 													.flatMap(s -> Arrays.asList(s, toKebab(s)).stream())
 													.collect(Collectors.toSet());
-					for (Map.Entry<String, IModel<?>> entry : propertyDataFibers.entrySet()) {
+					for (Map.Entry<String, DataFiber<?>> entry : propertyDataFibers.entrySet()) {
 						if(!normilizedAttrs.contains(entry.getKey())) {
-							Object object = entry.getValue().getObject();
+							Object object = entry.getValue().getValue();
 							if(object!=null)
 								tag.put(":"+entry.getKey(), 
 										VueSettings.get().getObjectMapper().writeValueAsString(object));
@@ -294,11 +291,11 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 		return new DataFiberBuilder<M, VueBehavior>(this, model, name);
 	}
 	
-	public <M> VueBehavior addDataFiber(String name, IModel<M> model, boolean property, boolean load, boolean observe, boolean refresh) {
-		if(property) propertyDataFibers.put(name, model);
-		if(load) loadDataFibers.put(name, model);
-		if(observe) observeDataFibers.put(name, model);
-		if(refresh) refreshDataFibers.put(name, model);
+	public <M> VueBehavior addDataFiber(String name, IModel<M> model, boolean property, boolean init, boolean update, boolean observe) {
+		
+		DataFiber<M> df = new DataFiber<M>(property?DataFiberType.PROPERTY:DataFiberType.DATA, 
+													name, model, init, update, observe); 
+		dataFibers.registerDataFiber(df);
 		return this;
 	}
 	
@@ -310,17 +307,14 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 	}
 	
 	@VueMethod
-	public void vcLoad(IVuecketMethod.Context ctx, Collection<String> toBeLoaded) {
-		if(toBeLoaded==null || toBeLoaded.isEmpty()) toBeLoaded = loadDataFibers.keySet();
+	public void vcInit(IVuecketMethod.Context ctx, Collection<String> toBeLoaded) {
+		if(toBeLoaded==null || toBeLoaded.isEmpty()) toBeLoaded = dataFibers.getInitDataFibers().keySet();
 		Map<String, Object> loadPatch = new HashMap<String, Object>();
 		for (String name : toBeLoaded) {
-			IModel<?> model = loadDataFibers.get(name);
-			if(model!=null) {
-				Object value = model.getObject();
-				loadPatch.put(name, model.getObject());
-				if(refreshDataFibers.containsKey(name)) {
-					refreshChangeIndicators.put(name, value!=null?value.hashCode():-1);
-				}
+			DataFiber<?> df = dataFibers.getInitDataFibers().get(name);
+			if(df!=null) {
+				Object value = df.getValue();
+				loadPatch.put(name, value);
 			}
 		}
 		IVuecketMethod.pushDataPatch(ctx, loadPatch);
@@ -328,18 +322,12 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 	
 	@VueMethod
 	public void vcRefresh(IVuecketMethod.Context ctx, Collection<String> toBeRefreshed) {
-		if(toBeRefreshed==null || toBeRefreshed.isEmpty()) toBeRefreshed = refreshDataFibers.keySet();
+		if(toBeRefreshed==null || toBeRefreshed.isEmpty()) toBeRefreshed = dataFibers.getUpdateDataFibers().keySet();
 		Map<String, Object> loadPatch = new HashMap<String, Object>();
 		for (String name : toBeRefreshed) {
-			IModel<?> model = refreshDataFibers.get(name);
-			if(model!=null) {
-				Object newValue = model.getObject();
-				int newHash = newValue!=null?newValue.hashCode():-1;
-				Integer oldHash = refreshChangeIndicators.get(name);
-				if(oldHash==null || newHash!=oldHash) {
-					loadPatch.put(name, model.getObject());
-					refreshChangeIndicators.put(name, newHash);
-				}
+			DataFiber<?> df = dataFibers.getUpdateDataFibers().get(name);
+			if(df!=null && df.isValueChanged()) {
+				loadPatch.put(name, df.getValue());
 			}
 		}
 		IVuecketMethod.pushDataPatch(ctx, loadPatch);
@@ -347,27 +335,24 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 	
 	@VueMethod
 	public void vcObserved(IVuecketMethod.Context ctx, String name, TreeNode node) throws JsonProcessingException {
-		IModel<Object> model = (IModel<Object>) observeDataFibers.get(name);
-		if(model==null) {
-			LOG.warn("Observing model '%s' was not found", name);
+		DataFiber<Object> df = (DataFiber<Object>)dataFibers.getObserveDataFibers().get(name); 
+		if(df==null) {
+			LOG.warn("Observable datafiber '%s' was not found", name);
 			return;
 		}
-		Class<?> requiredClass = getValueClass(model);
+		Class<?> requiredClass = df.getValueClass();
 		if(requiredClass==null) {
 			LOG.warn("Required class for observing model '%s' was not detected. Recommed to define it explicitly.", name);
 			return;
 		}
 		Object newValue = VueSettings.get().getObjectMapper().treeToValue(node, requiredClass);
-		model.setObject(newValue);
+		df.setValue(newValue);
 	}
 	
 	@Override
 	public void detach(Component component) {
 		super.detach(component);
-		for(IModel<?> model : propertyDataFibers.values()) model.detach();
-		for(IModel<?> model : loadDataFibers.values()) model.detach();
-		for(IModel<?> model : observeDataFibers.values()) model.detach();
-		for(IModel<?> model : refreshDataFibers.values()) model.detach();
+		dataFibers.detach();
 	}
 	
 	private void scanForAnnotations(Object object) {

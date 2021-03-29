@@ -50,10 +50,10 @@ const Vuecket = {
 				'vcApply' : function(patch) {
 					if(this.vcConfig) Object.assign(this, patch);
 				},
-				'vcLoad' : function(names) {
+				'vcInit' : function(names) {
 					if(this.vcConfig) {
-						if(!names) names = this.vcConfig.load;
-						this.vcInvoke("vcLoad", names);
+						if(!names) names = this.vcConfig.init;
+						this.vcInvoke("vcInit", names);
 					}
 				},
 				'vcRefresh' : function(names) {
@@ -127,4 +127,9 @@ Vue.prototype.$vcMailbox = {
 	genBoxId : function() {
 		return Math.random().toString(36).substring(2, 15);
 	}
+}
+
+Vue.prototype.$wrap = function(x) {
+	console.log(this, x);
+	return "Wrapped: "+x;
 }

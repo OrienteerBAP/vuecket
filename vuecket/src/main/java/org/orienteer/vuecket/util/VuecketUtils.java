@@ -122,12 +122,6 @@ public final class VuecketUtils {
 		} 
 	}
 	
-	public static Class<?> getValueClass(IModel<?> model) {
-		if(model instanceof IObjectClassAwareModel) return ((IObjectClassAwareModel<?>)model).getObjectClass();
-		Object value = model.getObject();
-		return value!=null?value.getClass():null;
-	}
-	
 	public static String removeSuffix(String str, String suffix) {
 		if(str==null || suffix==null ||  !str.endsWith(suffix)) return str;
 		else return str.substring(0, str.length() - suffix.length());

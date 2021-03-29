@@ -9,7 +9,7 @@ public class VueCustomComponent extends VueComponent<String> {
 
 	public VueCustomComponent(String id, IModel<String> model) {
 		super(id, model);
-		dataFiberBuilder("content").property().build();
+//		dataFiberBuilder("content").property().build();
 	}
 
 

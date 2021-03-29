@@ -49,8 +49,8 @@
 		
 		<div>
 			<h1>App #7</h1>
-			<div wicket:id="app7">
-				<vue-custom-component wicket:id="custom"/>
+			<div wicket:id="app7" :span="$wrap('test')">
+				<vue-custom-component wicket:id="custom" :content="$wrap(content)" />
 			</div>
 		</div>
 		<form wicket:id="form">
