@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -84,15 +85,15 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 		}
 		
 		public Collection<String> getInit() {
-			return dataFibers.getInitDataFibers().keySet();
+			return dataFibers.getDataFibersNames(DataFibersGroup.INIT_DATAFIBERS);
 		}
 		
 		public Collection<String> getObserve() {
-			return dataFibers.getObserveDataFibers().keySet();
+			return dataFibers.getDataFibersNames(DataFibersGroup.OBSERVE_DATAFIBERS);
 		}
 		
 		public Collection<String> getRefresh() {
-			return dataFibers.getUpdateDataFibers().keySet();
+			return dataFibers.getDataFibersNames(DataFibersGroup.UPDATE_DATAFIBERS);
 		}
 	}
 	
@@ -228,7 +229,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 			try {
 				String config = VueSettings.get().getObjectMapper().writeValueAsString(configView);
 				tag.put("vc-config", config );
-				Map<String, DataFiber<?>> propertyDataFibers = dataFibers.getPropertyDataFibers();
+				List<DataFiber<?>> propertyDataFibers = dataFibers.getDataFibers(DataFibersGroup.PROPERTY_DATAFIBERS);
 				if(!propertyDataFibers.isEmpty()) {
 					Set<String> normilizedAttrs = tag.getAttributes().keySet();
 					if(!normilizedAttrs.isEmpty())
@@ -236,11 +237,11 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 													.map(s -> getSuffixAfter(s, ":"))
 													.flatMap(s -> Arrays.asList(s, toKebab(s)).stream())
 													.collect(Collectors.toSet());
-					for (Map.Entry<String, DataFiber<?>> entry : propertyDataFibers.entrySet()) {
-						if(!normilizedAttrs.contains(entry.getKey())) {
-							Object object = entry.getValue().getValue();
+					for (DataFiber<?> df : propertyDataFibers) {
+						if(!normilizedAttrs.contains(df.getName())) {
+							Object object = df.getValue();
 							if(object!=null)
-								tag.put(":"+entry.getKey(), 
+								tag.put(":"+df.getName(), 
 										VueSettings.get().getObjectMapper().writeValueAsString(object));
 						}
 					}
@@ -308,45 +309,42 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 	
 	@VueMethod
 	public void vcInit(IVuecketMethod.Context ctx, Collection<String> toBeLoaded) {
-		if(toBeLoaded==null || toBeLoaded.isEmpty()) toBeLoaded = dataFibers.getInitDataFibers().keySet();
+		Map<String, DataFiber<?>> initFibers = dataFibers.getDataFibersAsMap(DataFibersGroup.INIT_DATAFIBERS);
+		if(toBeLoaded!=null && !toBeLoaded.isEmpty()) initFibers.keySet().retainAll(toBeLoaded);
 		Map<String, Object> loadPatch = new HashMap<String, Object>();
-		for (String name : toBeLoaded) {
-			DataFiber<?> df = dataFibers.getInitDataFibers().get(name);
-			if(df!=null) {
-				Object value = df.getValue();
-				loadPatch.put(name, value);
-			}
+		for (DataFiber<?> df : initFibers.values()) {
+			loadPatch.put(df.getName(), df.getValue());
 		}
 		IVuecketMethod.pushDataPatch(ctx, loadPatch);
 	}
 	
 	@VueMethod
 	public void vcRefresh(IVuecketMethod.Context ctx, Collection<String> toBeRefreshed) {
-		if(toBeRefreshed==null || toBeRefreshed.isEmpty()) toBeRefreshed = dataFibers.getUpdateDataFibers().keySet();
+		Map<String, DataFiber<?>> updateDataFibers = dataFibers.getDataFibersAsMap(DataFibersGroup.UPDATE_DATAFIBERS);
+		if(toBeRefreshed!=null && !toBeRefreshed.isEmpty()) updateDataFibers.keySet().retainAll(toBeRefreshed);
+		
 		Map<String, Object> loadPatch = new HashMap<String, Object>();
-		for (String name : toBeRefreshed) {
-			DataFiber<?> df = dataFibers.getUpdateDataFibers().get(name);
-			if(df!=null && df.isValueChanged()) {
-				loadPatch.put(name, df.getValue());
-			}
+		for (DataFiber<?> df : updateDataFibers.values()) {
+			if(df.isValueChanged()) loadPatch.put(df.getName(), df.getValue());
 		}
 		IVuecketMethod.pushDataPatch(ctx, loadPatch);
 	}
 	
 	@VueMethod
 	public void vcObserved(IVuecketMethod.Context ctx, String name, TreeNode node) throws JsonProcessingException {
-		DataFiber<Object> df = (DataFiber<Object>)dataFibers.getObserveDataFibers().get(name); 
-		if(df==null) {
+		Optional<DataFiber<?>> dfOptional = dataFibers.getDataFiberByName(name);
+		if(dfOptional.isPresent()) {
+			DataFiber<Object> df = (DataFiber<Object>)dfOptional.get();
+			Class<?> requiredClass = df.getValueClass();
+			if(requiredClass==null) {
+				LOG.warn("Required class for observing model '%s' was not detected. Recommed to define it explicitly.", name);
+				return;
+			}
+			Object newValue = VueSettings.get().getObjectMapper().treeToValue(node, requiredClass);
+			df.setValue(newValue);
+		} else {
 			LOG.warn("Observable datafiber '%s' was not found", name);
-			return;
 		}
-		Class<?> requiredClass = df.getValueClass();
-		if(requiredClass==null) {
-			LOG.warn("Required class for observing model '%s' was not detected. Recommed to define it explicitly.", name);
-			return;
-		}
-		Object newValue = VueSettings.get().getObjectMapper().treeToValue(node, requiredClass);
-		df.setValue(newValue);
 	}
 	
 	@Override

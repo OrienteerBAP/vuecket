@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -29,17 +31,8 @@ public class DataFibersGroup implements Iterable<DataFiber<?>>, IDetachable {
 	
 	private final List<DataFiber<?>> dataFibers = new ArrayList<DataFiber<?>>();
 	
-	private final Map<String, DataFiber<?>> propertyDataFibers = new HashMap<String, DataFiber<?>>();
-	private final Map<String, DataFiber<?>> initDataFibers = new HashMap<String, DataFiber<?>>();
-	private final Map<String, DataFiber<?>> updateDataFibers = new HashMap<String, DataFiber<?>>();
-	private final Map<String, DataFiber<?>> observeDataFibers = new HashMap<String, DataFiber<?>>();
-	
 	public DataFibersGroup registerDataFiber(DataFiber<?> df) {
 		dataFibers.add(df);
-		if(DataFiber.DataFiberType.PROPERTY.equals(df.getType())) propertyDataFibers.put(df.getName(), df);
-		if(df.shouldInit()) initDataFibers.put(df.getName(), df);
-		if(df.shouldUpdate()) updateDataFibers.put(df.getName(), df);
-		if(df.shouldObserve()) observeDataFibers.put(df.getName(), df);
 		return this;
 	}
 	
@@ -52,7 +45,7 @@ public class DataFibersGroup implements Iterable<DataFiber<?>>, IDetachable {
 		return getDataFibersAsStream(predicate).collect(Collectors.toList());
 	}
 	
-	public List<String> getDataFibersKeys(Predicate<DataFiber<?>> predicate) {
+	public List<String> getDataFibersNames(Predicate<DataFiber<?>> predicate) {
 		return getDataFibersAsStream(predicate).map(DataFiber::getName).collect(Collectors.toList());
 	}
 	
@@ -60,21 +53,8 @@ public class DataFibersGroup implements Iterable<DataFiber<?>>, IDetachable {
 		return getDataFibersAsStream(predicate).collect(Collectors.toMap(DataFiber::getName, Function.identity()));
 	}
 	
-	
-	public Map<String, DataFiber<?>> getPropertyDataFibers() {
-		return getDataFibersAsMap(PROPERTY_DATAFIBERS);
-	}
-
-	public Map<String, DataFiber<?>> getInitDataFibers() {
-		return getDataFibersAsMap(INIT_DATAFIBERS);
-	}
-
-	public Map<String, DataFiber<?>> getUpdateDataFibers() {
-		return getDataFibersAsMap(UPDATE_DATAFIBERS);
-	}
-
-	public Map<String, DataFiber<?>> getObserveDataFibers() {
-		return getDataFibersAsMap(OBSERVE_DATAFIBERS);
+	public Optional<DataFiber<?>> getDataFiberByName(String name) {
+		return getDataFibersAsStream(p-> Objects.equals(name, p.getName())).findFirst();
 	}
 
 	public int size() {
