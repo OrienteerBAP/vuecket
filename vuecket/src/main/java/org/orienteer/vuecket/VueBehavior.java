@@ -312,7 +312,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 		for (DataFiber<?> df : initFibers.values()) {
 			loadPatch.put(df.getName(), df.getValue());
 		}
-		IVuecketMethod.pushDataPatch(ctx, loadPatch);
+		IVuecketMethod.pushPatch(ctx, loadPatch, null);
 	}
 	
 	@VueMethod
@@ -327,7 +327,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 				df.updatePatch(dataPatch, propsPatch);
 			}
 		}
-		IVuecketMethod.pushDataPatch(ctx, dataPatch, propsPatch);
+		IVuecketMethod.pushPatch(ctx, dataPatch, propsPatch);
 	}
 	
 	@VueMethod

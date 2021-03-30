@@ -64,10 +64,10 @@ public interface IVuecketMethod<R> extends IClusterable {
 	}
 	
 	public static void pushDataPatch(Context ctx, Object... patchDescription)  {
-		pushDataPatch(ctx, VuecketUtils.toMap(patchDescription));
+		pushPatch(ctx, VuecketUtils.toMap(patchDescription), null);
 	}
 	
-	public static void pushDataPatch(Context ctx, Map<String, ?> dataPatch, Map<String, ?> propsPatch)  {
+	public static void pushPatch(Context ctx, Map<String, ?> dataPatch, Map<String, ?> propsPatch)  {
 		if((dataPatch==null || dataPatch.isEmpty())
 			 && (propsPatch==null || propsPatch.isEmpty()))	return;
 		try {
