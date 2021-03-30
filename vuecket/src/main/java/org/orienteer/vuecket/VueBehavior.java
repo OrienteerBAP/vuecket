@@ -289,13 +289,17 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 		return new DataFiberBuilder<M, VueBehavior>(this, model, name);
 	}
 	
-	public <M> VueBehavior addDataFiber(String name, IModel<M> model, boolean property, boolean init, boolean update, boolean observe) {
+	DataFibersGroup getDataFibers() {
+		return dataFibers;
+	}
+	
+	/*public <M> VueBehavior addDataFiber(String name, IModel<M> model, boolean property, boolean init, boolean update, boolean observe) {
 		
 		DataFiber<M> df = new DataFiber<M>(property?DataFiberType.PROPERTY:DataFiberType.DATA, 
 													name, model, init, update, observe); 
 		dataFibers.registerDataFiber(df);
 		return this;
-	}
+	}*/
 	
 	@Override
 	protected void onBind() {
@@ -308,11 +312,12 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 	public void vcInit(IVuecketMethod.Context ctx, Collection<String> toBeLoaded) {
 		Map<String, DataFiber<?>> initFibers = dataFibers.getDataFibersAsMap(DataFibersGroup.INIT_DATAFIBERS);
 		if(toBeLoaded!=null && !toBeLoaded.isEmpty()) initFibers.keySet().retainAll(toBeLoaded);
-		Map<String, Object> loadPatch = new HashMap<String, Object>();
+		Map<String, Object> dataPatch = new HashMap<String, Object>();
+		Map<String, Object> propsPatch = new HashMap<String, Object>();
 		for (DataFiber<?> df : initFibers.values()) {
-			loadPatch.put(df.getName(), df.getValue());
+			df.updatePatch(dataPatch, propsPatch);
 		}
-		IVuecketMethod.pushPatch(ctx, loadPatch, null);
+		IVuecketMethod.pushPatch(ctx, dataPatch, propsPatch);
 	}
 	
 	@VueMethod

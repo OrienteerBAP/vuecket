@@ -1,6 +1,7 @@
 package org.orienteer.vuecket;
 
 import org.apache.wicket.model.IModel;
+import org.orienteer.vuecket.DataFiber.DataFiberType;
 
 /**
  * Builder to simplify association of IModels with different fibers: property, load, observe, refresh
@@ -13,7 +14,8 @@ public class DataFiberBuilder<M, V extends IVueBehaviorLocator> {
 	private final String name;
 	private final IModel<M> model;
 	
-	private boolean property;
+	private IModel<M> initPropValue;
+	private DataFiberType type=DataFiberType.DATA;
 	private boolean init;
 	private boolean update;
 	private boolean observe;
@@ -25,12 +27,17 @@ public class DataFiberBuilder<M, V extends IVueBehaviorLocator> {
 	}
 	
 	public DataFiberBuilder<M, V> bindToProperty() {
-		this.property = true;
+		return bindToProperty(null);
+	}
+	
+	public DataFiberBuilder<M, V> bindToProperty(IModel<M> initPropValue) {
+		this.type = DataFiberType.PROPERTY;
+		this.initPropValue = initPropValue;
 		return this;
 	}
 	
 	public DataFiberBuilder<M, V> bindToData() {
-		this.property = false;
+		this.type = DataFiberType.DATA;
 		return this;
 	}
 	
@@ -50,9 +57,9 @@ public class DataFiberBuilder<M, V extends IVueBehaviorLocator> {
 	}
 	
 	
-	public V build() {
-		VueBehavior vueBehavior = locator.getVueBehavior();
-		vueBehavior.addDataFiber(name, model, property, init, update, observe);
+	public V bind() {
+		DataFiber<M> df = new DataFiber<M>(type, name, model, initPropValue, init, update, observe);
+		df.bind(locator);
 		return locator;
 	}
 }

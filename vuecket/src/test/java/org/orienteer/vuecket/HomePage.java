@@ -28,7 +28,7 @@ public class HomePage extends WebPage {
 		super(parameters);
 		add(new VueComponent<String>("app", Model.of("my attr"))
 				.setVueDescriptor("{ data: { message : 'Hello Vue'}}")
-				.dataFiberBuilder("customattr").bindToProperty().build()
+				.dataFiberBuilder("customattr").bindToProperty().bind()
 		);
 		
 		add(new VueComponent<String>("app2")
@@ -63,7 +63,7 @@ public class HomePage extends WebPage {
 											.init()
 											.observe()
 											.update()
-										.build();
+										.bind();
 		app6.add(new VueMarkdown("markdown", ""));
 		add(app6);
 		

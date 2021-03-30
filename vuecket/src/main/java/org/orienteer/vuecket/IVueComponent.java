@@ -88,11 +88,6 @@ public interface IVueComponent<C extends IVueBehaviorLocator> extends IVueBehavi
 		return new DataFiberBuilder<M, C>(getThisComponent(), model, name);
 	}
 	
-	public default <M> C addDataFiber(String name, IModel<M> model, boolean prop, boolean load, boolean observe, boolean refresh) {
-		getVueBehavior().addDataFiber(name, model, prop, load, observe, refresh);
-		return getThisComponent();
-	}
-	
 	public default int getRefreshPeriod() {
 		return getVueBehavior().getRefreshPeriod();
 	}

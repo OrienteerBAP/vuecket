@@ -28,15 +28,25 @@ public class DataFiber<T> implements IClusterable, IDetachable {
 	private final DataFiberType type;
 	private final String name;
 	private final IModel<T> model;
+	private final IModel<T> initPropModel;
 	private int revisionHash=-1;
 	private final boolean init;
 	private final boolean update;
 	private final boolean observe;
 	
-	public DataFiber(DataFiberType type, String name, IModel<T> model, boolean init, boolean update, boolean observe) {
+	public DataFiber(DataFiberType type, String name, IModel<T> model, boolean init , boolean update, boolean observe) {
+		this(type, name, model, null, init, update, observe);
+	}
+	
+	public DataFiber(String name, IModel<T> model, IModel<T> initPropModel, boolean update, boolean observe) {
+		this(DataFiberType.PROPERTY, name, model, initPropModel, initPropModel!=null, update, observe);
+	}
+	
+	DataFiber(DataFiberType type, String name, IModel<T> model, IModel<T> initPropModel, boolean init, boolean update, boolean observe) {
 		this.type = type;
 		this.name = name;
 		this.model = model;
+		this.initPropModel = initPropModel;
 		this.revisionHash = Objects.hashCode(model!=null?model.getObject():null);
 		this.init = init || update; //If fiber updatable: it should be also initialized
 		this.update = update;
@@ -53,6 +63,10 @@ public class DataFiber<T> implements IClusterable, IDetachable {
 
 	public IModel<T> getModel() {
 		return model;
+	}
+	
+	public IModel<T> getInitPropModel() {
+		return initPropModel;
 	}
 	
 	public T getValue() {
@@ -123,10 +137,16 @@ public class DataFiber<T> implements IClusterable, IDetachable {
 	public boolean shouldObserve() {
 		return observe;
 	}
+	
+	public DataFiber<T> bind(IVueBehaviorLocator locator) {
+		locator.getVueBehavior().getDataFibers().registerDataFiber(this);
+		return this;
+	}
 
 	@Override
 	public void detach() {
 		if(model!=null) model.detach();
+		if(initPropModel!=null) initPropModel.detach();
 	}
 	
 }
