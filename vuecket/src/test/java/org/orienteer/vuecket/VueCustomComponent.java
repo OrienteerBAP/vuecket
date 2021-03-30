@@ -9,7 +9,7 @@ public class VueCustomComponent extends VueComponent<String> {
 
 	public VueCustomComponent(String id, IModel<String> model) {
 		super(id, model);
-		dataFiberBuilder("content").bindToProperty().update().bind();
+		dataFiberBuilder("content").bindToProperty("INIT VALUE").update().bind();
 	}
 
 

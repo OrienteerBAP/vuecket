@@ -1,6 +1,9 @@
 package org.orienteer.vuecket;
 
+import java.io.Serializable;
+
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.orienteer.vuecket.DataFiber.DataFiberType;
 
 /**
@@ -27,12 +30,17 @@ public class DataFiberBuilder<M, V extends IVueBehaviorLocator> {
 	}
 	
 	public DataFiberBuilder<M, V> bindToProperty() {
-		return bindToProperty(null);
+		return bindToProperty((IModel<M>)null);
+	}
+	
+	public DataFiberBuilder<M, V> bindToProperty(M initPropValue) {
+		return bindToProperty((IModel<M>)(initPropValue==null?null:Model.of((Serializable)initPropValue)));
 	}
 	
 	public DataFiberBuilder<M, V> bindToProperty(IModel<M> initPropValue) {
 		this.type = DataFiberType.PROPERTY;
 		this.initPropValue = initPropValue;
+		this.init = this.init || initPropValue!=null;
 		return this;
 	}
 	

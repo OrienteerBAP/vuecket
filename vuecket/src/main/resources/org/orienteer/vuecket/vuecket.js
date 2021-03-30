@@ -95,8 +95,8 @@ const Vuecket = {
 					registerMethods.call(this, this.vcConfig.on, this.$on);
 					registerMethods.call(this, this.vcConfig.once, this.$once);
 					registerMethods.call(this, this.vcConfig.watch, this.$watch);
-					if(this.vcConfig.load) {
-						this.vcLoad();
+					if(this.vcConfig.init) {
+						this.vcInit();
 					}
 					if(this.vcConfig.observe) {
 						this.vcConfig.observe.forEach(m => this.$watch(m, function(newValue){

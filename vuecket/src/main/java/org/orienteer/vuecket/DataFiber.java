@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.IObjectClassAwareModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.util.io.IClusterable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -79,9 +80,16 @@ public class DataFiber<T> implements IClusterable, IDetachable {
 		return VueSettings.get().getObjectMapper().writeValueAsString(getValue());
 	}
 	
+	public String getInitialValueAsJson() throws JsonProcessingException {
+		IModel<T> initModel = getInitPropModel();
+		if(initModel!=null) {
+			return VueSettings.get().getObjectMapper().writeValueAsString(initModel.getObject());
+		} else return getValueAsJson();
+	}
+	
 	public String getValueAsVueProperty(String componentId) throws JsonProcessingException {
-		String attrValue = getValueAsJson();
-		if(shouldUpdate()) 
+		String attrValue = getInitialValueAsJson();
+		if(shouldUpdate() || getInitPropModel()!=null) 
 			attrValue = String.format("$vcDataFiber('%s', '%s', %s)", 
 											componentId,
 											getName(), 
@@ -128,6 +136,16 @@ public class DataFiber<T> implements IClusterable, IDetachable {
 	
 	public boolean shouldInit() {
 		return init;
+	}
+	
+	public boolean shouldInitByClient() {
+		return shouldInit()
+				&& (DataFiberType.DATA.equals(getType()) 
+					|| (getInitPropModel()!=null && !Objects.equals(getModel(), getInitPropModel())));
+	}
+	
+	public boolean shouldInitPropAttribute() {
+		return DataFiberType.PROPERTY.equals(getType()) && shouldInit();
 	}
 	
 	public boolean shouldUpdate() {

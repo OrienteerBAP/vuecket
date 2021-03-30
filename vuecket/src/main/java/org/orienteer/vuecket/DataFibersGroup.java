@@ -24,8 +24,10 @@ public class DataFibersGroup implements Iterable<DataFiber<?>>, IDetachable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	public static final SerializablePredicate<DataFiber<?>> PROPERTY_DATAFIBERS = df -> DataFiberType.PROPERTY.equals(df.getType());
-	public static final SerializablePredicate<DataFiber<?>> INIT_DATAFIBERS = DataFiber::shouldInit;
+//	public static final SerializablePredicate<DataFiber<?>> PROPERTY_DATAFIBERS = df -> DataFiberType.PROPERTY.equals(df.getType());
+//	public static final SerializablePredicate<DataFiber<?>> INIT_DATAFIBERS = DataFiber::shouldInit;
+	public static final SerializablePredicate<DataFiber<?>> INIT_BY_CLIENT_DATAFIBERS = DataFiber::shouldInitByClient;
+	public static final SerializablePredicate<DataFiber<?>> INIT_PROPS_DATAFIBERS = DataFiber::shouldInitPropAttribute;
 	public static final SerializablePredicate<DataFiber<?>> UPDATE_DATAFIBERS = DataFiber::shouldUpdate;
 	public static final SerializablePredicate<DataFiber<?>> OBSERVE_DATAFIBERS = DataFiber::shouldObserve;
 	

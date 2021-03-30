@@ -85,7 +85,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 		}
 		
 		public Collection<String> getInit() {
-			return dataFibers.getDataFibersNames(DataFibersGroup.INIT_DATAFIBERS);
+			return dataFibers.getDataFibersNames(DataFibersGroup.INIT_BY_CLIENT_DATAFIBERS);
 		}
 		
 		public Collection<String> getObserve() {
@@ -229,7 +229,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 			try {
 				String config = VueSettings.get().getObjectMapper().writeValueAsString(configView);
 				tag.put("vc-config", config );
-				List<DataFiber<?>> propertyDataFibers = dataFibers.getDataFibers(DataFibersGroup.PROPERTY_DATAFIBERS);
+				List<DataFiber<?>> propertyDataFibers = dataFibers.getDataFibers(DataFibersGroup.INIT_PROPS_DATAFIBERS);
 				if(!propertyDataFibers.isEmpty()) {
 					Set<String> normilizedAttrs = tag.getAttributes().keySet();
 					if(!normilizedAttrs.isEmpty())
@@ -310,7 +310,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 	
 	@VueMethod
 	public void vcInit(IVuecketMethod.Context ctx, Collection<String> toBeLoaded) {
-		Map<String, DataFiber<?>> initFibers = dataFibers.getDataFibersAsMap(DataFibersGroup.INIT_DATAFIBERS);
+		Map<String, DataFiber<?>> initFibers = dataFibers.getDataFibersAsMap(DataFibersGroup.INIT_BY_CLIENT_DATAFIBERS);
 		if(toBeLoaded!=null && !toBeLoaded.isEmpty()) initFibers.keySet().retainAll(toBeLoaded);
 		Map<String, Object> dataPatch = new HashMap<String, Object>();
 		Map<String, Object> propsPatch = new HashMap<String, Object>();
