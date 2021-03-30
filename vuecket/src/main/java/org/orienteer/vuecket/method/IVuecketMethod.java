@@ -67,11 +67,13 @@ public interface IVuecketMethod<R> extends IClusterable {
 		pushDataPatch(ctx, VuecketUtils.toMap(patchDescription));
 	}
 	
-	public static void pushDataPatch(Context ctx, Map<String, ?> patch)  {
-		if(patch==null || patch.isEmpty()) return;
+	public static void pushDataPatch(Context ctx, Map<String, ?> dataPatch, Map<String, ?> propsPatch)  {
+		if((dataPatch==null || dataPatch.isEmpty())
+			 && (propsPatch==null || propsPatch.isEmpty()))	return;
 		try {
-			String json = VueSettings.get().getObjectMapper().writeValueAsString(patch);
-			String script = String.format("Vue.getVueById('%s').vcApply(%s)", ctx.getComponent().getMarkupId(), json);
+			String dataJson = VueSettings.get().getObjectMapper().writeValueAsString(dataPatch);
+			String propsJson = VueSettings.get().getObjectMapper().writeValueAsString(propsPatch);
+			String script = String.format("Vue.getVueById('%s').vcApply(%s, %s)", ctx.getComponent().getMarkupId(), dataJson, propsJson);
 			ctx.getTarget().appendJavaScript(script);
 		} catch (JsonProcessingException e) {
 			throw new WicketRuntimeException(e);

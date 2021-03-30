@@ -47,8 +47,17 @@ const Vuecket = {
 							});
 						}
 		 		},
-				'vcApply' : function(patch) {
-					if(this.vcConfig) Object.assign(this, patch);
+				'vcApply' : function(dataPatch, propsPatch) {
+					if(this.vcConfig) {
+						if(dataPatch && Object.keys(dataPatch).length) Object.assign(this, dataPatch);
+						if(propsPatch && Object.keys(propsPatch).length) {
+							if(!this.vcConfig.props) this.vcConfig.props = {};
+							Object.assign(this.vcConfig.props, propsPatch);
+							
+							if(this.$parent) this.$parent.$forceUpdate();
+							else this.$forceUpdate();
+						}
+					}
 				},
 				'vcInit' : function(names) {
 					if(this.vcConfig) {
@@ -95,7 +104,7 @@ const Vuecket = {
 							}));
 					}
 					if(this.vcConfig.refresh) {
-						this.vcConfig.refreshTimer = setInterval(this.vcRefresh, this.vcConfig.rp*2000);
+						this.vcConfig.refreshTimer = setInterval(this.vcRefresh, this.vcConfig.rp*1000);
 					}
 				}
 			},
@@ -109,7 +118,8 @@ const Vuecket = {
 Vue.use(Vuecket);
 
 Vue.getVueById = function(id) {
-	return document.getElementById(id).__vue__;
+	var elm = document.getElementById(id);
+	return elm?elm.__vue__:null;
 };
 
 Vue.loadRootVue = function(resourceURL, elm) {
@@ -129,7 +139,20 @@ Vue.prototype.$vcMailbox = {
 	}
 }
 
-Vue.prototype.$wrap = function(x) {
-	console.log(this, x);
-	return "Wrapped: "+x;
+Vue.prototype.$vcDataFiber = function(id, prop, value) {
+	var v = Vue.getVueById(id);
+	if(v) {
+		if(v.vcConfig 
+			&& v.vcConfig.props 
+			&& v.vcConfig.props.hasOwnProperty(prop)) 
+				return v.vcConfig.props[prop];
+	}
+	Vue.nextTick(function(){
+		var v = Vue.getVueById(id);
+		if(v) {
+			if(!v.vcConfig.props) v.vcConfig.props = {};
+			v.vcConfig.props[prop] = value;
+		}
+	});
+	return value;
 }

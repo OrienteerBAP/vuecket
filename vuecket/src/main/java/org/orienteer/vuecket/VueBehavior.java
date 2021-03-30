@@ -239,10 +239,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 													.collect(Collectors.toSet());
 					for (DataFiber<?> df : propertyDataFibers) {
 						if(!normilizedAttrs.contains(df.getName())) {
-							Object object = df.getValue();
-							if(object!=null)
-								tag.put(":"+df.getName(), 
-										VueSettings.get().getObjectMapper().writeValueAsString(object));
+							tag.put(":"+df.getName(), df.getValueAsVueProperty(getComponentMarkupId()));
 						}
 					}
 				}
@@ -323,11 +320,14 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 		Map<String, DataFiber<?>> updateDataFibers = dataFibers.getDataFibersAsMap(DataFibersGroup.UPDATE_DATAFIBERS);
 		if(toBeRefreshed!=null && !toBeRefreshed.isEmpty()) updateDataFibers.keySet().retainAll(toBeRefreshed);
 		
-		Map<String, Object> loadPatch = new HashMap<String, Object>();
+		Map<String, Object> dataPatch = new HashMap<String, Object>();
+		Map<String, Object> propsPatch = new HashMap<String, Object>();
 		for (DataFiber<?> df : updateDataFibers.values()) {
-			if(df.isValueChanged()) loadPatch.put(df.getName(), df.getValue());
+			if(df.isValueChanged()) {
+				df.updatePatch(dataPatch, propsPatch);
+			}
 		}
-		IVuecketMethod.pushDataPatch(ctx, loadPatch);
+		IVuecketMethod.pushDataPatch(ctx, dataPatch, propsPatch);
 	}
 	
 	@VueMethod

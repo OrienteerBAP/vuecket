@@ -1,11 +1,14 @@
 package org.orienteer.vuecket;
 
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.IObjectClassAwareModel;
 import org.apache.wicket.util.io.IClusterable;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * DataFiber is object to communicate between client side and server side
@@ -35,7 +38,7 @@ public class DataFiber<T> implements IClusterable, IDetachable {
 		this.name = name;
 		this.model = model;
 		this.revisionHash = Objects.hashCode(model!=null?model.getObject():null);
-		this.init = init;
+		this.init = init || update; //If fiber updatable: it should be also initialized
 		this.update = update;
 		this.observe = observe;
 	}
@@ -56,6 +59,30 @@ public class DataFiber<T> implements IClusterable, IDetachable {
 		T value = getValueInternal();
 		revisionHash = Objects.hashCode(value);
 		return value;
+	}
+	
+	public String getValueAsJson() throws JsonProcessingException {
+		return VueSettings.get().getObjectMapper().writeValueAsString(getValue());
+	}
+	
+	public String getValueAsVueProperty(String componentId) throws JsonProcessingException {
+		String attrValue = getValueAsJson();
+		if(shouldUpdate()) 
+			attrValue = String.format("$vcDataFiber('%s', '%s', %s)", 
+											componentId,
+											getName(), 
+											attrValue);
+		return attrValue;
+	}
+	
+	public DataFiber<T> updatePatch(Map<String, Object> patch) {
+		patch.put(getName(), getValue());
+		return this;
+	}
+	
+	public DataFiber<T> updatePatch(Map<String, Object> dataPatch, Map<String, Object> propsPatch) {
+		updatePatch(DataFiberType.DATA.equals(getType())?dataPatch:propsPatch);
+		return this;
 	}
 	
 	public DataFiber<T> setValue(T value) {

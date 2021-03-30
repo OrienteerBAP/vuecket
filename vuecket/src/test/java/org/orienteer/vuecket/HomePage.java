@@ -10,7 +10,11 @@ import org.orienteer.vuecket.method.VueWatch;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
+
+import java.util.Date;
+
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.WebPage;
@@ -64,7 +68,7 @@ public class HomePage extends WebPage {
 		add(app6);
 		
 		VueComponent<Void> app7 = new VueComponent<Void>("app7").setVueDescriptor("{ data : function () { return {'content': 'Initial content'}}, methods : { proxy : function(c){ console.log(c, typeof c); return new Proxy({'content': c}, {get(t, p, r){console.log(t,p,r); return 'Interception: '+t.content;}}) }}}");
-		app7.add(new VueCustomComponent("custom", Model.of("Text as component model")));
+		app7.add(new VueCustomComponent("custom", LambdaModel.of(() -> new Date().toString())));
 		add(app7);
 		
 		Form<?> form = new Form<Object>("form");
