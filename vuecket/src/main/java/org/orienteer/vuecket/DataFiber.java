@@ -48,7 +48,7 @@ public class DataFiber<T> implements IClusterable, IDetachable {
 		this.name = name;
 		this.model = model;
 		this.initPropModel = initPropModel;
-		this.revisionHash = Objects.hashCode(model!=null?model.getObject():null);
+		this.revisionHash = -1;
 		this.init = init || update; //If fiber updatable: it should be also initialized
 		this.update = update;
 		this.observe = observe;

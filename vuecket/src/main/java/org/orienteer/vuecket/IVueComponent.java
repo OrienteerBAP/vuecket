@@ -96,4 +96,8 @@ public interface IVueComponent<C extends IVueBehaviorLocator> extends IVueBehavi
 		getVueBehavior().setRefreshPeriod(refreshPeriod);
 		return getThisComponent();
 	}
+	
+	public default DataFibersGroup getDataFibers() {
+		return getVueBehavior().getDataFibers();
+	}
 }

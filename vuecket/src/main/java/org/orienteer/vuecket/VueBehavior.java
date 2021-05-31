@@ -289,7 +289,7 @@ public class VueBehavior extends AbstractDefaultAjaxBehavior implements IVueBeha
 		return new DataFiberBuilder<M, VueBehavior>(this, model, name);
 	}
 	
-	DataFibersGroup getDataFibers() {
+	public DataFibersGroup getDataFibers() {
 		return dataFibers;
 	}
 	

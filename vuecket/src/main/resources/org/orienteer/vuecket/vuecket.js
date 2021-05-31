@@ -55,7 +55,10 @@ const Vuecket = {
 							Object.assign(this.vcConfig.props, propsPatch);
 							
 							if(this.$parent) this.$parent.$forceUpdate();
-							else this.$forceUpdate();
+							else {
+								Object.assign(this.$props, propsPatch);
+								this.$forceUpdate();
+							}
 						}
 					}
 				},
@@ -109,7 +112,7 @@ const Vuecket = {
 				}
 			},
 		    beforeDestroy () {
-		      if(this.vcConfig.refreshTimer) clearInterval(this.vcConfig.refreshTimer);
+		      if(this.vcConfig && this.vcConfig.refreshTimer) clearInterval(this.vcConfig.refreshTimer);
 		    }
 		 });
 	}

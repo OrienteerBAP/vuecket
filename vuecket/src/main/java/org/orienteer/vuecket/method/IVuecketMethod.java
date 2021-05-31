@@ -1,11 +1,17 @@
 package org.orienteer.vuecket.method;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.util.io.IClusterable;
+import org.orienteer.vuecket.DataFiber;
+import org.orienteer.vuecket.DataFibersGroup;
 import org.orienteer.vuecket.VueBehavior;
 import org.orienteer.vuecket.VueSettings;
 import org.orienteer.vuecket.util.VuecketUtils;
@@ -78,5 +84,32 @@ public interface IVuecketMethod<R> extends IClusterable {
 		} catch (JsonProcessingException e) {
 			throw new WicketRuntimeException(e);
 		}
+	}
+	
+	public static void pushDataFibers(Context ctx, boolean ifChanged, String... dataFiberNames) {
+		if(dataFiberNames==null || dataFiberNames.length==0) return;
+		List<DataFiber<?>> dataFibers = new ArrayList<DataFiber<?>>();
+		DataFibersGroup dataFiberGroup = ctx.getVueBehavior().getDataFibers();
+		for (String name : dataFiberNames) {
+			dataFiberGroup.getDataFiberByName(name).ifPresent(dataFibers::add);
+		}
+		pushDataFibers(ctx, ifChanged, dataFibers);
+	}
+	
+	public static void pushDataFibers(Context ctx, boolean ifChanged, DataFiber<?>... dataFibers) {
+		if(dataFibers==null || dataFibers.length==0) return;
+		pushDataFibers(ctx, ifChanged, Arrays.asList(dataFibers));
+	}
+	
+	public static void pushDataFibers(Context ctx, boolean ifChanged, Iterable<DataFiber<?>> dataFibers) {
+		if(dataFibers==null) return;
+		Map<String, Object> dataPatch = new HashMap<String, Object>();
+		Map<String, Object> propsPatch = new HashMap<String, Object>();
+		for (DataFiber<?> df : dataFibers) {
+			if(!ifChanged || df.isValueChanged()) {
+				df.updatePatch(dataPatch, propsPatch);
+			}
+		}
+		IVuecketMethod.pushPatch(ctx, dataPatch, propsPatch);
 	}
 }

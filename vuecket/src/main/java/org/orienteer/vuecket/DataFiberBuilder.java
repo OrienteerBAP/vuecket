@@ -64,8 +64,12 @@ public class DataFiberBuilder<M, V extends IVueBehaviorLocator> {
 		return this;
 	}
 	
-	
+	@Deprecated
 	public V bind() {
+		return build();
+	}
+	
+	public V build() {
 		DataFiber<M> df = new DataFiber<M>(type, name, model, initPropValue, init, update, observe);
 		df.bind(locator);
 		return locator;
