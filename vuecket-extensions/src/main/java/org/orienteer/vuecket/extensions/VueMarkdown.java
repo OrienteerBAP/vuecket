@@ -1,4 +1,4 @@
-package org.orienteer.vuecket.demo;
+package org.orienteer.vuecket.extensions;
 
 import java.io.Serializable;
 

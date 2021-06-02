@@ -3,6 +3,7 @@ package org.orienteer.vuecket.demo;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.orienteer.vuecket.VueComponent;
+import org.orienteer.vuecket.extensions.VueMarkdown;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.WebPage;
 

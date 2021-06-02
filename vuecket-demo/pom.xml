@@ -20,6 +20,11 @@
 			<artifactId>vuecket</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.orienteer.vuecket</groupId>
+			<artifactId>vuecket-extensions</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- LOGGING DEPENDENCIES - SLF4J-SIMPLE -->
 		<dependency>
 			<groupId>org.slf4j</groupId>

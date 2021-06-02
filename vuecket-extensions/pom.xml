@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>vuecket-parent</artifactId>
+    <groupId>org.orienteer.vuecket</groupId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>vuecket-extensions</artifactId>
+
+  <name>vuecket-extensions</name>
+
+  <dependencies>
+    <dependency>
+		<groupId>org.orienteer.vuecket</groupId>
+		<artifactId>vuecket</artifactId>
+		<version>${project.version}</version>
+	</dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+  	<plugins>
+  		<plugin>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-maven-plugin</artifactId>
+			<version>${jetty9.version}</version>
+			<configuration>
+				<systemProperties>
+					<systemProperty>
+						<name>maven.project.build.directory.test-classes</name>
+						<value>${project.build.directory}/test-classes</value>
+					</systemProperty>
+				</systemProperties>
+				<useProvidedScope>true</useProvidedScope>
+                   <useTestScope>true</useTestScope>
+				<supportedPackagings>
+                       <supportedPackaging>jar</supportedPackaging>
+                   </supportedPackagings>
+				<jettyXml>${project.basedir}/../vuecket-demo/src/test/jetty/jetty.xml,${project.basedir}/../vuecket-demo/src/test/jetty/jetty-http.xml</jettyXml>
+				<webApp>
+					<descriptor>${project.basedir}/src/test/jetty/web.xml</descriptor>
+					<contextPath>/</contextPath>
+					<resourceBase>src/test/resources</resourceBase>
+					<containerIncludeJarPattern>^$</containerIncludeJarPattern>
+					<webInfIncludeJarPattern>^$</webInfIncludeJarPattern>
+				</webApp>
+			</configuration>
+		</plugin>
+  	</plugins>
+    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+      <plugins>
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.7.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>3.0.0</version>
+        </plugin>
+        <!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.5.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.2</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
+</project>
