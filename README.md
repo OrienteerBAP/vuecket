@@ -55,6 +55,21 @@ Add the following dependency into your `pom.xml`:
 </dependency>
 ```
 
+If you are using `SNAPSHOT` version, please make sure that the following repository is included into your `pom.xml`:
+
+```xml
+<repository>
+	<id>Sonatype Nexus</id>
+	<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+	<releases>
+		<enabled>false</enabled>
+	</releases>
+	<snapshots>
+		<enabled>true</enabled>
+	</snapshots>
+</repository>
+```
+
 ## Association of Wicket and Vue Components
 
 To start using of Vuecket power you should associate your server-side component(Wicket) and client-side component(Vue.js).
