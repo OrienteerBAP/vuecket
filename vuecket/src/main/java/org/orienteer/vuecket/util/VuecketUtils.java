@@ -35,7 +35,7 @@ public final class VuecketUtils {
 	
 	private final static Random RANDOM = new Random();
 	private final static Converter<String, String> CONVERTER_TO_KEBAB 
-								= CaseFormat.UPPER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE);
+								= CaseFormat.UPPER_CAMEL.converterTo(CaseFormat.LOWER_HYPHEN);
 	
 	private VuecketUtils() {
 		

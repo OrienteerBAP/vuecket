@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
@@ -20,6 +21,7 @@ import org.orienteer.vuecket.method.JsFunction;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 import org.orienteer.vuecket.method.VueMethod;
@@ -49,6 +51,7 @@ public class FullCalendar extends VueComponent<FullCalendar.Options> {
 	 * Container for events data
 	 */
 	@Data
+	@Accessors(chain = true)
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	public static class Event implements IClusterable {
 		private String id;
@@ -58,12 +61,14 @@ public class FullCalendar extends VueComponent<FullCalendar.Options> {
 		private Date end;
 		private String title;
 		private String url;
+		private String backgroundColor;
 	}
 	
 	/**
 	 * Options for FullCalendar
 	 */
 	@Data
+	@Accessors(chain = true)
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	public static class Options implements IClusterable {
 		private Object events;
@@ -91,6 +96,12 @@ public class FullCalendar extends VueComponent<FullCalendar.Options> {
 	protected void onInitialize() {
 		super.onInitialize();
 		dataFiberBuilder("options").bindToProperty().init().build();
+	}
+	
+	@Override
+	protected void onComponentTag(ComponentTag tag) {
+		tag.setName("full-calendar");
+		super.onComponentTag(tag);
 	}
 	
 	@Override
