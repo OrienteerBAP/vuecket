@@ -1,8 +1,10 @@
 package org.orienteer.vuecket.util;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +21,10 @@ import org.orienteer.vuecket.VueBehavior;
 import org.orienteer.vuecket.VueComponent;
 import org.orienteer.vuecket.VueSettings;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -136,14 +141,35 @@ public final class VuecketUtils {
 	}
 	
 	public static JsonNode toJsonNode(String json) {
+		return toJsonNode(VueSettings.get().getObjectMapper(), json);
+	}
+	
+	public static JsonNode toJsonNode(ObjectMapper om, String json) {
 		try {
-			ObjectMapper om = VueSettings.get().getObjectMapper();
 			if(Strings.isEmpty(json)) return NullNode.getInstance();
 			char firstChar = json.trim().charAt(0);
 			if(firstChar!='{' && firstChar!='[' && firstChar!='"') return TextNode.valueOf(json);
 			else return om.readTree(json);
 		} catch (JsonProcessingException e) {
 			throw new WicketRuntimeException("Wrong json format: "+json, e);
+		}
+	}
+	
+	public static <T> T jsonNodeToValue(TreeNode node, Type type) throws JsonProcessingException {
+		return jsonNodeToValue(VueSettings.get().getObjectMapper(), node, type);
+	}
+	
+	public static <T> T jsonNodeToValue(ObjectMapper om, TreeNode node, Type type) throws JsonProcessingException {
+		if(node==null) return null;
+		try {
+			if(type instanceof Class) return om.treeToValue(node, (Class<T>) type);
+			else {
+				return (T) om.readValue(om.treeAsTokens(node), om.getTypeFactory().constructType(type));
+			}
+		} catch (JsonProcessingException e) {
+			throw e;
+		} catch (IOException e) {
+			throw new IllegalStateException("We shouldn't have exceptions here", e);
 		}
 	}
 	

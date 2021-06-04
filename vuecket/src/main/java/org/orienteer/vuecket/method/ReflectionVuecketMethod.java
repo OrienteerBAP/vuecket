@@ -1,6 +1,9 @@
 package org.orienteer.vuecket.method;
 
+import static org.orienteer.vuecket.util.VuecketUtils.jsonNodeToValue;
+
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.WicketRuntimeException;
@@ -50,10 +53,12 @@ public class ReflectionVuecketMethod<R> implements IVuecketMethod<R> {
 			vals[0] = ctx;
 			shift=1;
 		}
+		Method method = getMethod();
+		Type[] genericParameterTypes = method.getGenericParameterTypes();
 		for(int indx = 0; indx < args.size() && indx+shift < vals.length; indx++) {
-			vals[indx+shift] = om.treeToValue(args.get(indx), parameterTypes[indx+shift]);
+			vals[indx+shift] = jsonNodeToValue(om, args.get(indx), genericParameterTypes[indx+shift]);
 		}
-		return (R) getMethod().invoke(obj, vals);
+		return (R) method.invoke(obj, vals);
 	}
 	
 	@Override
