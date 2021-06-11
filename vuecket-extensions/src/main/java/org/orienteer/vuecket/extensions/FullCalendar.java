@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -13,9 +14,9 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.util.io.IClusterable;
 import org.orienteer.vuecket.VueComponent;
 import org.orienteer.vuecket.VueSettings;
-import org.orienteer.vuecket.VueSettings.INPMPackageProvider;
 import org.orienteer.vuecket.descriptor.VueNpm;
 import org.orienteer.vuecket.method.IVuecketMethod.Context;
+import org.orienteer.vuecket.npmprovider.INPMPackageProvider;
 import org.orienteer.vuecket.method.JsFunction;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -119,5 +120,10 @@ public class FullCalendar extends VueComponent<FullCalendar.Options> {
 	
 	public List<Event> lookupEvents(Date start, Date end) {
 		return new ArrayList<FullCalendar.Event>();
+	}
+	
+	public void refetchEvents(AjaxRequestTarget target) {
+		String script = String.format("Vue.getVueById('%s').getApi().refetchEvents()", getMarkupId());
+		target.appendJavaScript(script);
 	}
 }

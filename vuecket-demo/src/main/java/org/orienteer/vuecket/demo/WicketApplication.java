@@ -27,6 +27,10 @@ public class WicketApplication extends WebApplication
 	public void init()
 	{
 		super.init();
+		/*WebjarsSettings settings = new WebjarsSettings();
+
+        WicketWebjars.install(this, settings);
+        VueSettings.get().setNpmPackageProvider(WebJarsNPMPackageProvider.WEBJARS_PROVIDER);*/
 
 		// add your configuration here
 	}
