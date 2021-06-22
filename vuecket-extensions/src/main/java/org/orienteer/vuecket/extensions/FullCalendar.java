@@ -73,7 +73,10 @@ public class FullCalendar extends VueComponent<FullCalendar.Options> {
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	public static class Options implements IClusterable {
 		private Object events;
-		private Object headerToolbar = VuecketUtils.toJsonNode("{ center: 'dayGridMonth,timeGridWeek' }");
+		private Toolbar headerToolbar = new Toolbar().setCenter("dayGridMonth,timeGridWeek");
+		private Toolbar footerToolbar;
+		private Float aspectRatio;
+		private String initialView;
 		
 		public Options(Object events) {
 			this.events = events;
@@ -82,6 +85,18 @@ public class FullCalendar extends VueComponent<FullCalendar.Options> {
 		public Options(FullCalendar calendar) {
 			this(JsFunction.call(calendar, "lookupEvents"));
 		}
+	}
+	
+	/**
+	 * Toolbar definition for FullCalendar
+	 */
+	@Data
+	@Accessors(chain = true)
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	public static class Toolbar implements IClusterable {
+		private String start;
+		private String center;
+		private String end;
 	}
 	
 	public FullCalendar(String id) {
