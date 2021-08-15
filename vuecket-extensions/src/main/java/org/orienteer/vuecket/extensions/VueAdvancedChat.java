@@ -17,6 +17,7 @@ import org.orienteer.vuecket.VueSettings;
 import org.orienteer.vuecket.descriptor.VueNpm;
 import org.orienteer.vuecket.method.IVuecketMethod;
 import org.orienteer.vuecket.method.VueOn;
+import org.orienteer.vuecket.util.VuecketUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -119,6 +120,12 @@ public abstract class VueAdvancedChat extends VueComponent<Void> {
 		private Boolean saved;
 		private Boolean distributed;
 		private Boolean seen;
+		
+		public ChatMessage setDateAndTimestamp(Date timestamp) {
+			setDate(VuecketUtils.toDateString(timestamp));
+			setTimestamp(VuecketUtils.toTimeString(timestamp));
+			return this;
+		}
 	}
 	
 	/**

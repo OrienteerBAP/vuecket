@@ -5,16 +5,24 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.TimeZone;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.Session;
 import org.apache.wicket.WicketRuntimeException;
+import org.apache.wicket.core.request.ClientInfo;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.IObjectClassAwareModel;
+import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.protocol.http.request.WebClientInfo;
 import org.apache.wicket.util.string.Strings;
 import org.orienteer.vuecket.IVueBehaviorLocator;
 import org.orienteer.vuecket.VueBehavior;
@@ -175,5 +183,42 @@ public final class VuecketUtils {
 	
 	public static String toKebab(String string) {
 		return string!=null?CONVERTER_TO_KEBAB.convert(string):null;
+	}
+	
+	public static Locale getLocale() {
+		Locale ret = null;
+		if(Session.exists()) {
+			ret = Session.get().getLocale();
+		}
+		return ret!=null?ret:Locale.getDefault();
+	}
+	
+	public static TimeZone getTimeZone() {
+		TimeZone ret = null;
+		if(Session.exists()) {
+			ClientInfo info = Session.get().getClientInfo();
+			if(info instanceof WebClientInfo) ret = ((WebClientInfo)info).getProperties().getTimeZone();
+		}
+		return ret!=null?ret:TimeZone.getDefault();
+	}
+	
+	public static String toDateString(Date date) {
+		return toDateString(date, DateFormat.SHORT);
+	}
+	
+	public static String toDateString(Date date, int style) {
+		DateFormat format =  DateFormat.getDateInstance(style, getLocale());
+		format.setTimeZone(getTimeZone());
+		return format.format(date);
+	}
+	
+	public static String toTimeString(Date date) {
+		return toTimeString(date, DateFormat.SHORT);
+	}
+	
+	public static String toTimeString(Date date, int style) {
+		DateFormat format =  DateFormat.getTimeInstance(style, getLocale());
+		format.setTimeZone(getTimeZone());
+		return format.format(date);
 	}
 }
